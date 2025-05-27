@@ -1,0 +1,110 @@
+"use client";
+import React, { useState } from "react";
+
+interface EditItemFormProps {
+  item: {
+    id: number;
+    name: string;
+    description: string;
+    fullDescription: string;
+    price: number;
+    image: string;
+    ingredients: string[];
+    servingTips: string[];
+    recommendations: string[];
+  };
+}
+
+const EditItemForm: React.FC<EditItemFormProps> = ({ item }) => {
+  const [form, setForm] = useState({
+    name: item.name || "",
+    description: item.description || "",
+    fullDescription: item.fullDescription || "",
+    price: item.price?.toString() || "",
+    image: item.image || "",
+    ingredients: Array.isArray(item.ingredients) ? item.ingredients.join(", ") : "",
+    servingTips: Array.isArray(item.servingTips) ? item.servingTips.join(", ") : "",
+    recommendations: Array.isArray(item.recommendations) ? item.recommendations.join(", ") : "",
+  });
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const validate = () => {
+    if (!form.name.trim()) return "Name is required.";
+    if (!form.price || isNaN(Number(form.price))) return "Valid price is required.";
+    if (!form.image.trim()) return "Image URL is required.";
+    return "";
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+    const validation = validate();
+    if (validation) {
+      setError(validation);
+      return;
+    }
+    setLoading(true);
+    const res = await fetch(`/api/items/${item.id}/edit`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...form,
+        price: Number(form.price),
+        ingredients: form.ingredients.split(",").map((s: string) => s.trim()).filter(Boolean),
+        servingTips: form.servingTips.split(",").map((s: string) => s.trim()).filter(Boolean),
+        recommendations: form.recommendations.split(",").map((s: string) => s.trim()).filter(Boolean),
+      }),
+    });
+    setLoading(false);
+    if (res.ok) {
+      setSuccess("Item updated successfully!");
+    } else {
+      const data = await res.json();
+      setError(data.error || "Failed to update item.");
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="max-w-xl mx-auto bg-white p-6 rounded shadow">
+      <h2 className="text-2xl font-bold mb-4">Edit Item</h2>
+      {error && <div className="text-red-500 mb-2">{error}</div>}
+      {success && <div className="text-green-600 mb-2">{success}</div>}
+      <label className="block mb-2">Name
+        <input name="name" value={form.name} onChange={handleChange} className="w-full border p-2 rounded" />
+      </label>
+      <label className="block mb-2">Description
+        <textarea name="description" value={form.description} onChange={handleChange} className="w-full border p-2 rounded" />
+      </label>
+      <label className="block mb-2">Full Description
+        <textarea name="fullDescription" value={form.fullDescription} onChange={handleChange} className="w-full border p-2 rounded" />
+      </label>
+      <label className="block mb-2">Price
+        <input name="price" type="number" value={form.price} onChange={handleChange} className="w-full border p-2 rounded" />
+      </label>
+      <label className="block mb-2">Image URL
+        <input name="image" value={form.image} onChange={handleChange} className="w-full border p-2 rounded" />
+      </label>
+      <label className="block mb-2">Ingredients (comma separated)
+        <input name="ingredients" value={form.ingredients} onChange={handleChange} className="w-full border p-2 rounded" />
+      </label>
+      <label className="block mb-2">Serving Tips (comma separated)
+        <input name="servingTips" value={form.servingTips} onChange={handleChange} className="w-full border p-2 rounded" />
+      </label>
+      <label className="block mb-2">Recommendations (comma separated)
+        <input name="recommendations" value={form.recommendations} onChange={handleChange} className="w-full border p-2 rounded" />
+      </label>
+      <button type="submit" className="mt-4 px-4 py-2 bg-green-600 text-white rounded" disabled={loading}>
+        {loading ? "Saving..." : "Save Changes"}
+      </button>
+    </form>
+  );
+};
+
+export default EditItemForm;
