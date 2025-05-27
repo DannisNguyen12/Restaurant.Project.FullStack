@@ -1,0 +1,110 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema  
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init  
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+/// Represents a menu category like appetizer, main course, dessert
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items Item[]
+}
+
+/// Represents a dish on the menu
+model Item {
+  id              Int         @id @default(autoincrement())
+  name            String
+  description     String?
+  fullDescription String?
+  price           Float
+  image           String?
+  ingredients     Json        // Can store array of strings or objects
+  servingTips     Json
+  recommendations Json
+  categoryId      Int?
+  category        Category?   @relation(fields: [categoryId], references: [id])
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  likes     Like[]
+  orderItems OrderItem[]
+}
+
+/// Registered users who can like dishes
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String?
+  password  String
+  role      UserRole @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  likes Like[]
+}
+
+/// Track which user liked which item
+model Like {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  itemId    Int
+  item      Item     @relation(fields: [itemId], references: [id])
+  type      LikeType
+  createdAt DateTime @default(now())
+
+  @@unique([userId, itemId]) // One like per user per item
+}
+
+/// Optional: Orders and related models
+model Order {
+  id           Int          @id @default(autoincrement())
+  customerName String
+  tableNumber  Int?
+  total        Float
+  status       OrderStatus  @default(PENDING)
+  items        OrderItem[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+
+model OrderItem {
+  id       Int    @id @default(autoincrement())
+  quantity Int
+  itemId   Int
+  item     Item   @relation(fields: [itemId], references: [id])
+  orderId  Int
+  order    Order  @relation(fields: [orderId], references: [id])
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum LikeType {
+  LIKE
+  DISLIKE
+}
+
+enum OrderStatus {
+  PENDING
+  PREPARING
+  READY
+  COMPLETED
+  CANCELLED
+}
