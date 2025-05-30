@@ -28,7 +28,7 @@ async function getItems() {
 
 export default async function HomePage() {
   // Check authentication
-  requireAuth();
+  await requireAuth();
   
   const items = await getItems();
   return (
