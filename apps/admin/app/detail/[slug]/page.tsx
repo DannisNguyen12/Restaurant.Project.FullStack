@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
 import { PrismaClient } from "@repo/database/generated/prisma";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import EditItemForm from "../../../components/item/editItem";
 
 const prisma = new PrismaClient();
@@ -9,7 +11,12 @@ function safeStringArray(val: unknown): string[] {
 }
 
 export default async function ItemDetailPage({ params }: { params: { slug: string } }) {
-  
+  const cookieStore = await cookies();
+  const session = cookieStore.get("admin_session");
+  if (!session) {
+    redirect("/login");
+  }
+
   const id = Number(params.slug);
   if (isNaN(id)) return notFound();
 

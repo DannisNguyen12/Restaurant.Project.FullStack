@@ -1,8 +1,8 @@
 import React from "react";
-import ListOfCard from "@repo/ui/item/listOfCard";
+import ListOfCard from "../components/item/listOfCard";
 import { PrismaClient } from "@repo/database/generated/prisma";
-
-
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 const prisma = new PrismaClient();
 
@@ -27,6 +27,11 @@ async function getItems() {
 }
 
 export default async function HomePage() {
+  const cookieStore = await cookies();
+  const session = cookieStore.get("admin_session");
+  if (!session) {
+    redirect("/login");
+  }
   const items = await getItems();
   return (
     <main>

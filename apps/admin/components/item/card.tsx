@@ -1,5 +1,6 @@
 // components/Card.tsx
 import React from 'react';
+import Image from 'next/image';
 
 
 interface MenuItem {
@@ -18,7 +19,7 @@ interface MenuItemCardProps {
 const Card: React.FC<MenuItemCardProps> = ({ item, onDelete }) => {
   return (
     <div className="bg-white p-4 rounded shadow-md hover:shadow-lg transition duration-300">
-      <img
+      <Image
         src={item.image}
         alt={item.name}
         className="w-full h-[200px] object-cover mb-4 rounded"

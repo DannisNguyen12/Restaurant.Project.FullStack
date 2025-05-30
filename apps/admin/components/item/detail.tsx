@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import React from 'react';
 
 // Define TypeScript interface for MenuItem
@@ -19,7 +20,7 @@ const MenuItemDetail: React.FC<{ item: MenuItem }> = ({ item }) => {
       {/* Dish Header */}
       <div className="flex flex-col md:flex-row gap-6 mb-8">
         <div className="md:w-1/2">
-          <img
+          <Image
             src={item.image}
             alt={item.name}
             className="w-full h-[300px] object-cover rounded-lg"

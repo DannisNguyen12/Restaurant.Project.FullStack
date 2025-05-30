@@ -1,0 +1,47 @@
+import React from "react";
+import Image from "next/image";
+import Link from "next/link";
+
+interface ItemCardProps {
+  item: {
+    id: number;
+    name: string;
+    description?: string;
+    price: number;
+    image?: string;
+    likes?: any[];
+    slug?: string;
+  };
+}
+
+const Card: React.FC<ItemCardProps> = ({ item }) => {
+  return (
+    <div className="bg-white p-4 rounded shadow-md hover:shadow-lg transition duration-300">
+      {item.image && (
+        <Image
+          src={item.image.trim()}
+          alt={item.name}
+          width={400}
+          height={250}
+          className="w-full h-[200px] object-cover mb-4 rounded"
+        />
+      )}
+      <h2 className="text-xl font-bold mb-2">
+        <Link href={`/detail/${item.id}`} className="hover:underline text-green-700">
+          {item.name}
+        </Link>
+      </h2>
+      {item.price && (
+        <p className="text-green-600 font-semibold mb-2">
+          {typeof item.price === "number"
+            ? item.price.toLocaleString("en-US", { style: "currency", currency: "USD" })
+            : item.price}
+        </p>
+      )}
+      {item.description && <p className="text-gray-600 mb-2">{item.description}</p>}
+      {item.likes && <div className="text-xs text-gray-500 mt-1">Likes: {item.likes.length}</div>}
+    </div>
+  );
+};
+
+export default Card;
