@@ -19,13 +19,16 @@ const Card: React.FC<ItemCardProps> = ({ item, onAddToCart }) => {
   return (
     <div className="bg-white p-4 rounded shadow-md hover:shadow-lg transition duration-300">
       {item.image && (
-        <Image
-          src={item.image.trim()}
-          alt={item.name}
-          width={400}
-          height={250}
-          className="w-full h-[200px] object-cover mb-4 rounded"
-        />
+        <div className="relative w-full h-[200px] mb-4">
+          <Image
+            src={item.image.trim()}
+            alt={item.name}
+            fill
+            sizes="(max-width: 768px) 100vw, 400px"
+            style={{ objectFit: 'cover' }}
+            className="rounded"
+          />
+        </div>
       )}
       <h2 className="text-xl font-bold mb-2">
         <Link href={`/detail/${item.id}`} className="hover:underline text-green-700">

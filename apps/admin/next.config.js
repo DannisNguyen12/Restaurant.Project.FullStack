@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ["placehold.co"],
+    domains: ["http://acs.amazonaws.com/groups/global/AllUsers"],
   },
 };
 

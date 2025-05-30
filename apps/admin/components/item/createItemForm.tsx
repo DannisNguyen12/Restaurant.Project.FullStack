@@ -1,7 +1,9 @@
 "use client";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function CreateItemForm() {
+  const router = useRouter();
   const [form, setForm] = useState({
     name: "",
     description: "",
@@ -18,7 +20,8 @@ export default function CreateItemForm() {
 
   const validate = () => {
     if (!form.name.trim()) return "Name is required.";
-    if (!form.price || isNaN(Number(form.price))) return "Valid price is required.";
+    if (!form.price || isNaN(Number(form.price)) || Number(form.price) <= 0) 
+      return "Valid price is required (must be a positive number).";
     if (!form.image.trim()) return "Image URL is required.";
     return "";
   };
@@ -36,34 +39,49 @@ export default function CreateItemForm() {
       setError(validation);
       return;
     }
+    
     setLoading(true);
-    const res = await fetch("/api/items/create", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...form,
-        price: Number(form.price),
-        ingredients: form.ingredients.split(",").map((s: string) => s.trim()).filter(Boolean),
-        servingTips: form.servingTips.split(",").map((s: string) => s.trim()).filter(Boolean),
-        recommendations: form.recommendations.split(",").map((s: string) => s.trim()).filter(Boolean),
-      }),
-    });
-    setLoading(false);
-    if (res.ok) {
-      setSuccess("Item created successfully!");
-      setForm({
-        name: "",
-        description: "",
-        fullDescription: "",
-        price: "",
-        image: "",
-        ingredients: "",
-        servingTips: "",
-        recommendations: "",
+    try {
+      const res = await fetch("/api/items/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...form,
+          price: Number(form.price),
+          ingredients: form.ingredients.split(",").map((s: string) => s.trim()).filter(Boolean),
+          servingTips: form.servingTips.split(",").map((s: string) => s.trim()).filter(Boolean),
+          recommendations: form.recommendations.split(",").map((s: string) => s.trim()).filter(Boolean),
+        }),
       });
-    } else {
+      
       const data = await res.json();
-      setError(data.error || "Failed to create item.");
+      
+      if (res.ok) {
+        setSuccess("Item created successfully!");
+        setForm({
+          name: "",
+          description: "",
+          fullDescription: "",
+          price: "",
+          image: "",
+          ingredients: "",
+          servingTips: "",
+          recommendations: "",
+        });
+        
+        // Redirect to home page after a short delay to show success message
+        setTimeout(() => {
+          router.push('/');
+          router.refresh();
+        }, 1500);
+      } else {
+        setError(data.error || "Failed to create item.");
+      }
+    } catch (err) {
+      setError("An unexpected error occurred. Please try again.");
+      console.error("Create item error:", err);
+    } finally {
+      setLoading(false);
     }
   };
 

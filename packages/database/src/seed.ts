@@ -37,7 +37,7 @@ async function main() {
       fullDescription:
         'Pho bo is one of Vietnam’s most iconic dishes. Made with slow-cooked beef bones, aromatic spices, and fresh rice noodles, it delivers deep umami flavor in every spoonful.',
       price: 12.99,
-      image: 'https://placehold.co/600x400?text=Pho+Bo ',
+      image: 's3://restaurantwebsiteproject/e7ddae1f-399d-490a-acff-847131fd5cec.png',
       ingredients: ['Beef bones', 'Rice noodles', 'Star anise', 'Cloves', 'Ginger', 'Onion', 'Fish sauce'],
       servingTips: [
         'Stir well before eating to mix flavors.',
@@ -56,7 +56,7 @@ async function main() {
       fullDescription:
         'Banh Mi is a classic Vietnamese sandwich made with a crispy baguette, pickled veggies, herbs, and your choice of protein.',
       price: 8.99,
-      image: 'https://placehold.co/600x400?text=Banh+Mi ',
+      image: 's3://restaurantwebsiteproject/2c4e7cb9-99d6-4d76-bc45-7bffda155548.png',
       ingredients: ['Baguette', 'Pâté', 'Pickled carrots', 'Cucumber', 'Chili sauce'],
       servingTips: ['Eat while warm for best texture.', 'Pair with a cold drink.'],
       recommendations: ['Fruit smoothie', 'Iced coffee'],
@@ -71,7 +71,7 @@ async function main() {
       fullDescription:
         'These fresh Vietnamese spring rolls are filled with shrimp, vermicelli noodles, mint, lettuce, and other fresh veggies — light and healthy!',
       price: 6.99,
-      image: 'https://placehold.co/600x400?text=Spring+Rolls ',
+      image: 's3://restaurantwebsiteproject/1c68945f-3f4f-4a66-8c2a-b369f3e6ee56.png',
       ingredients: ['Shrimp', 'Vermicelli noodles', 'Lettuce', 'Mint', 'Carrots', 'Rice paper'],
       servingTips: ['Dip in peanut or hoisin sauce.', 'Eat within 30 minutes of preparation.'],
       recommendations: ['Tofu soup', 'Green tea'],
@@ -86,7 +86,7 @@ async function main() {
       fullDescription:
         'A rich, creamy, and indulgent dessert made with mascarpone cheese, cocoa powder, and strong brewed coffee.',
       price: 7.99,
-      image: 'https://placehold.co/600x400?text=Tiramisu ',
+      image: 's3://restaurantwebsiteproject/3db71eff-9e40-4cb8-8d62-cddeff73d7e8.png',
       ingredients: ['Ladyfingers', 'Espresso', 'Mascarpone', 'Eggs', 'Sugar', 'Cocoa powder'],
       servingTips: ['Best served chilled.', 'Let sit for 5 mins after refrigeration.'],
       recommendations: ['Coffee', 'Sweet wine'],

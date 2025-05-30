@@ -14,7 +14,6 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [cart, setCart] = useState<{ id: number; name: string; price: number; quantity: number }[]>([]);
-  const [showCart, setShowCart] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams();
@@ -34,8 +33,12 @@ export default function HomePage() {
 
   // Load cart from server cookies on mount ONLY (not polling)
   useEffect(() => {
+    console.log("Page mounted, attempting to load cart from cookies");
+    
     // First, try to load from API
-    fetch("/api/cart")
+    fetch("/api/cart", {
+      credentials: "include" // Important to include cookies
+    })
       .then(res => {
         if (!res.ok) {
           console.error("Failed to fetch cart from API:", res.status);
@@ -170,7 +173,6 @@ export default function HomePage() {
       saveCartToCookie(updatedCart);
       return updatedCart;
     });
-    setShowCart(true);
   };
 
   const handleIncrease = (id: number) => {

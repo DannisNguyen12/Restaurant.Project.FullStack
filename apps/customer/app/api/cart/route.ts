@@ -12,14 +12,11 @@ export async function GET(request: Request) {
         // First try direct JSON parsing (if not URL-encoded)
         if (value.startsWith('[') || value.startsWith('{')) {
           cart = JSON.parse(value);
-          console.log("GET /api/cart: Successfully parsed direct JSON from cookie:", cart);
         } else {
           // Try URL-decoded parsing
           cart = JSON.parse(decodeURIComponent(value));
-          console.log("GET /api/cart: Successfully parsed decoded cart from cookie:", cart);
         }
       } catch (parseError) {
-        console.error("GET /api/cart: Error parsing cart cookie value", parseError);
         // ignore parse error, return empty cart
       }
     }

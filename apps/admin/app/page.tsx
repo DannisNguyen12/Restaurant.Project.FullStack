@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import ListOfCard from "../components/item/listOfCard";
 import { PrismaClient } from "@repo/database/generated/prisma";
 import { cookies } from "next/headers";
@@ -36,7 +37,7 @@ export default async function HomePage() {
   return (
     <main>
       <div className="flex justify-end max-w-6xl mx-auto mt-8">
-        <a href="/create" className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition font-semibold">+ Create New Item</a>
+        <Link href="/create" className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition font-semibold">+ Create New Item</Link>
       </div>
       <ListOfCard items={items} />
     </main>
