@@ -11,9 +11,10 @@ interface ListOfCardProps {
     image?: string;
     likes?: any[];
   }>;
+  onAddToCart?: (item: { id: number; name: string; price: number }) => void;
 }
 
-const ListOfCard: React.FC<ListOfCardProps> = ({ items }) => {
+const ListOfCard: React.FC<ListOfCardProps> = ({ items, onAddToCart }) => {
   return (
     <section className="py-12 px-6 bg-gray-100">
       <div className="max-w-6xl mx-auto">
@@ -21,7 +22,7 @@ const ListOfCard: React.FC<ListOfCardProps> = ({ items }) => {
         <h2 className="text-3xl font-bold mt-2">Experience the flavors of Vietnam</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
           {items.map((item) => (
-            <Card key={item.id} item={item} />
+            <Card key={item.id} item={item} onAddToCart={onAddToCart} />
           ))}
         </div>
       </div>
