@@ -2,8 +2,7 @@ import React from "react";
 import Link from "next/link";
 import ListOfCard from "../components/item/listOfCard";
 import { PrismaClient } from "@repo/database/generated/prisma";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { requireAuth } from "../utils/auth";
 
 const prisma = new PrismaClient();
 
@@ -28,11 +27,9 @@ async function getItems() {
 }
 
 export default async function HomePage() {
-  const cookieStore = await cookies();
-  const session = cookieStore.get("admin_session");
-  if (!session) {
-    redirect("/login");
-  }
+  // Check authentication
+  requireAuth();
+  
   const items = await getItems();
   return (
     <main>

@@ -1,10 +1,9 @@
 import { notFound } from "next/navigation";
 import { PrismaClient } from "@repo/database/generated/prisma";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import Link from "next/link";
 import EditItemForm from "../../../components/item/editItem";
 import ItemPreview from "../../../components/item/itemPreview";
+import { requireAuth } from "../../../utils/auth";
 
 const prisma = new PrismaClient();
 
@@ -13,11 +12,8 @@ function safeStringArray(val: unknown): string[] {
 }
 
 export default async function ItemDetailPage({ params }: { params: { id: string } }) {
-  const cookieStore = await cookies();
-  const session = cookieStore.get("admin_session");
-  if (!session) {
-    redirect("/login");
-  }
+  // Check authentication
+  requireAuth();
 
   const id = Number(params.id);
   if (isNaN(id)) return notFound();

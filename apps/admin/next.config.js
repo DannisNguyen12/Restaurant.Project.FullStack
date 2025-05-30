@@ -1,7 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ["http://acs.amazonaws.com/groups/global/AllUsers"],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'restaurantwebsiteproject.s3.ap-southeast-2.amazonaws.com',
+        pathname: '/**',
+      }
+    ],
   },
 };
 
