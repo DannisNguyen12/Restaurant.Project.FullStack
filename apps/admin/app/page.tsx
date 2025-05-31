@@ -32,7 +32,7 @@ async function getItems() {
     image: string;
   }
 
-    return items.map((item): FormattedItem => ({
+    return items.map((item: Item): FormattedItem => ({
       ...item,
       id: parseInt(item.id.toString()),
       description: item.description || '',
