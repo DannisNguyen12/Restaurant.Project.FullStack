@@ -1,5 +1,5 @@
 {
-  "name": "Restaurant",
+  "name": "restaurant-project-fullstack",
   "private": true,
   "scripts": {
     "build": "turbo run build",
