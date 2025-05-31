@@ -1,11 +1,9 @@
 import { notFound } from "next/navigation";
-import { PrismaClient } from "@repo/database/generated/prisma";
+import { prisma } from "@repo/database/index";
 import Link from "next/link";
 import EditItemForm from "../../../components/item/editItem";
 import ItemPreview from "../../../components/item/itemPreview";
 import { requireAuth } from "../../../utils/auth";
-
-const prisma = new PrismaClient();
 
 function safeStringArray(val: unknown): string[] {
   return Array.isArray(val) ? val.filter((v): v is string => typeof v === "string") : [];

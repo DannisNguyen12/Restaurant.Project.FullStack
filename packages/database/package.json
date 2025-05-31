@@ -1,10 +1,14 @@
 {
-  "name": "database",
+  "name": "@repo/database",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "index.ts",
+  "type": "module",
   "scripts": {
-    "seed": "tsx src/seed.ts"
+    "seed": "tsx src/seed.ts",
+    "check": "tsx src/check-db.ts",
+    "prisma:generate": "prisma generate",
+    "prisma:push": "prisma db push"
   },
   "keywords": [],
   "author": "",

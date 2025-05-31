@@ -17,7 +17,7 @@ interface ItemCardProps {
 
 const Card: React.FC<ItemCardProps> = ({ item, onAddToCart }) => {
   return (
-    <div className="bg-white p-4 rounded shadow-md hover:shadow-lg transition duration-300">
+    <div className="bg-white p-4 rounded shadow-md hover:shadow-lg transition duration-300" data-testid="menu-item">
       {item.image && (
         <div className="relative w-full h-[200px] mb-4">
           <Image
@@ -48,6 +48,7 @@ const Card: React.FC<ItemCardProps> = ({ item, onAddToCart }) => {
         <button
           className="mt-2 w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition"
           onClick={() => onAddToCart({ id: item.id, name: item.name, price: item.price })}
+          data-testid="add-to-cart-button"
         >
           Add to Cart
         </button>

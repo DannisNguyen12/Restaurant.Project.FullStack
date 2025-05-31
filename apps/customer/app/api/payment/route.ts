@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@repo/database/generated/prisma";
+import { prisma } from "@repo/database/index";
 import jwt from "jsonwebtoken";
 
-const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || "changeme";
 
 export async function POST(request: Request) {

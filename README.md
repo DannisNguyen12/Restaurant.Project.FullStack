@@ -1,54 +1,98 @@
-# Turborepo starter
+# Restaurant Project Full Stack
 
-This Turborepo starter is maintained by the Turborepo core team.
+A complete restaurant management system with customer-facing ordering app and admin dashboard.
 
-## Using this example
+## Features
 
-Run the following command:
+### Customer App (Port 3001)
+- Browse menu items with search and category filtering
+- Item detail pages with ingredients and recommendations
+- Add items to cart
+- Complete the checkout process
+- User authentication
+- Mobile-responsive design
 
-```sh
-npx create-turbo@latest
-```
+### Admin App (Port 3002)
+- View all menu items
+- Create, edit, and delete menu items
+- Admin authentication with role-based access
+- Dashboard with order statistics
 
-## What's inside?
+## Tech Stack
 
-This Turborepo includes the following packages/apps:
+- **Frontend**: Next.js, React, TailwindCSS
+- **Backend**: Next.js API routes
+- **Database**: SQLite with Prisma ORM
+- **Testing**: Playwright for E2E testing
+- **Package Management**: pnpm with Turborepo
 
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
+## Project Structure
 
 ```
-cd my-turborepo
-pnpm build
+Restaurant.Project.FullStack/
+├── apps/
+│   ├── admin/          # Admin dashboard app
+│   └── customer/       # Customer-facing ordering app
+├── packages/
+│   ├── database/       # Shared database package with Prisma
+│   ├── eslint-config/  # Shared ESLint configuration
+│   ├── test/           # E2E testing with Playwright
+│   ├── typescript-config/ # Shared TypeScript configuration
+│   └── ui/             # Shared UI components
 ```
 
-### Develop
+## Getting Started
 
-To develop all apps and packages, run the following command:
+### Prerequisites
 
-```
-cd my-turborepo
-pnpm dev
-```
+- Node.js 18+
+- pnpm (v9.0.0 or higher)
+
+### Installation
+
+1. Clone the repository
+   ```bash
+   git clone https://github.com/yourusername/restaurant-project.git
+   cd restaurant-project
+   ```
+
+2. Install dependencies
+   ```bash
+   pnpm install
+   ```
+
+3. Generate Prisma client and seed the database
+   ```bash
+   pnpm seed
+   ```
+
+4. Start the development servers
+   ```bash
+   pnpm start-apps
+   ```
+
+5. Visit the applications
+   - Customer App: http://localhost:3001
+   - Admin App: http://localhost:3002
+
+### Database Management
+
+The project uses SQLite with Prisma ORM:
+
+- Generate Prisma client
+  ```bash
+  cd packages/database && npx prisma generate
+  ```
+
+- Push schema changes to database
+  ```bash
+  cd packages/database && npx prisma db push
+  ```
+
+- Seed the database with test data
+  ```bash
+  pnpm seed
+  ```
 
 ### Remote Caching
 
@@ -82,3 +126,53 @@ Learn more about the power of Turborepo:
 - [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
 - [Configuration Options](https://turborepo.com/docs/reference/configuration)
 - [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+
+## Testing
+
+### E2E Tests
+
+This project uses Playwright for end-to-end testing:
+
+```bash
+# Run all tests
+pnpm test:e2e
+
+# Run admin tests only
+pnpm test:admin
+
+# Run customer tests only
+pnpm test:customer
+```
+
+### Verify Setup
+
+To check if your setup is correct:
+
+```bash
+pnpm verify
+```
+
+## Login Information
+
+The database is seeded with these test users:
+
+**Admin:**
+- Email: admin@example.com
+- Password: 123
+
+**Customers:**
+- Email: alice@example.com
+- Password: 123
+- Email: bob@example.com
+- Password: 123
+
+## Contributing
+
+1. Create a new branch for your feature
+2. Make your changes
+3. Run tests to ensure functionality
+4. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.

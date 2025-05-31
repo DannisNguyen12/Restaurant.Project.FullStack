@@ -25,8 +25,8 @@ const Cart: React.FC<{
     0
   );
   return (
-    <div className="fixed top-4 right-4 z-50 bg-white rounded shadow-lg p-4 min-w-[300px]">
-      <h3 className="font-bold text-lg mb-2">Cart</h3>
+    <div className="fixed top-4 right-4 z-50 bg-white rounded shadow-lg p-4 min-w-[300px]" data-testid="cart-modal">
+      <h3 className="font-bold text-lg mb-2">Cart <span data-testid="cart-count">{cart.length}</span></h3>
       {cart.length === 0 ? (
         <div className="text-gray-500">Your cart is empty.</div>
       ) : (
@@ -35,6 +35,7 @@ const Cart: React.FC<{
             <li
               key={item.id}
               className="flex items-center justify-between mb-2"
+              data-testid="cart-item"
             >
               <span>{item.name}</span>
               <span className="flex items-center gap-2">

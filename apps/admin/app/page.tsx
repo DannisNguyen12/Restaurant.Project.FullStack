@@ -1,10 +1,8 @@
 import React from "react";
 import Link from "next/link";
 import ListOfCard from "../components/item/listOfCard";
-import { PrismaClient } from "@repo/database/generated/prisma";
+import { prisma } from "@repo/database/index";
 import { requireAuth } from "../utils/auth";
-
-const prisma = new PrismaClient();
 
 async function getItems() {
   // Fetch all items from the database
@@ -18,12 +16,29 @@ async function getItems() {
     },
   });
   // Convert price to string for UI compatibility and provide default values for nullable fields
-  return items.map(item => ({
-    ...item,
-    description: item.description || '',
-    image: item.image || '',
-    price: item.price?.toLocaleString("en-US", { style: "currency", currency: "USD" }),
-  }));
+  interface Item {
+    id: number;
+    name: string;
+    description: string | null;
+    price: number | null;
+    image: string | null;
+  }
+
+  interface FormattedItem {
+    id: number;
+    name: string;
+    description: string;
+    price: string | undefined;
+    image: string;
+  }
+
+    return items.map((item): FormattedItem => ({
+      ...item,
+      id: parseInt(item.id.toString()),
+      description: item.description || '',
+      image: item.image || '',
+      price: item.price?.toLocaleString("en-US", { style: "currency", currency: "USD" }),
+    }));
 }
 
 export default async function HomePage() {

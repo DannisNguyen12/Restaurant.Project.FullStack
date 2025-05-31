@@ -1,7 +1,7 @@
 // prisma/seed.ts
 
 import { PrismaClient } from '../generated/prisma'
-import bcrypt from 'bcryptjs';
+import * as bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient()
 
@@ -101,6 +101,8 @@ async function main() {
   // Seed users
   const hashedPassword1 = await bcrypt.hash('123', 10);
   const hashedPassword2 = await bcrypt.hash('123', 10);
+  const hashedPasswordAdmin = await bcrypt.hash('123', 10);
+  
   const user1 = await prisma.user.upsert({
     where: { email: 'alice@example.com' },
     update: {},
@@ -120,8 +122,22 @@ async function main() {
       password: hashedPassword2,
     },
   });
+  
+  // Create admin user
+  const adminUser = await prisma.user.upsert({
+    where: { email: 'admin@example.com' },
+    update: {
+      role: 'ADMIN', // Ensure role is updated even if user exists
+    },
+    create: {
+      email: 'admin@example.com',
+      name: 'Admin User',
+      password: hashedPasswordAdmin,
+      role: 'ADMIN',
+    },
+  });
 
-  console.log(`✅ Created users: ${user1.name}, ${user2.name}`);
+  console.log(`✅ Created users: ${user1.name}, ${user2.name}, ${adminUser.name} (Admin)`);
 
   // Seed likes
   await prisma.like.createMany({

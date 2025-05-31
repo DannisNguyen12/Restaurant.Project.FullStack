@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@repo/database/generated/prisma";
+import { prisma } from "@repo/database/index";
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
-const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'your-fallback-secret-key';
 const COOKIE_NAME = "admin_session";
 const COOKIE_MAX_AGE = 60 * 10; // 10 minutes in seconds

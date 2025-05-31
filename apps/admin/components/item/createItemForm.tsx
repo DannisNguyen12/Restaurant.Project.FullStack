@@ -68,12 +68,9 @@ export default function CreateItemForm() {
           servingTips: "",
           recommendations: "",
         });
-        
-        // Redirect to home page after a short delay to show success message
-        setTimeout(() => {
-          router.push('/');
-          router.refresh();
-        }, 1500);
+        // Redirect to home page immediately after success
+        router.push('/');
+        return;
       } else {
         setError(data.error || "Failed to create item.");
       }
