@@ -18,7 +18,7 @@ cd /workspaces/Project.Restaurant/Restaurant.Project.FullStack
 # Start admin app in the background
 echo -e "${CYAN}Starting Admin App on port 3002...${NC}"
 cd apps/admin
-npm run dev &
+pnpm run dev &
 ADMIN_PID=$!
 
 # Wait a bit for the first app to initialize
@@ -27,7 +27,7 @@ sleep 3
 # Start customer app in the background
 echo -e "${CYAN}Starting Customer App on port 3001...${NC}"
 cd ../customer
-npm run dev &
+pnpm run dev &
 CUSTOMER_PID=$!
 
 echo -e "${GREEN}Both apps are running!${NC}"

@@ -26,6 +26,9 @@ A complete restaurant management system with customer-facing ordering app and ad
 - **Testing**: Playwright for E2E testing
 - **Package Management**: pnpm with Turborepo
 
+> [!NOTE]
+> This project is configured to use pnpm as the package manager. All commands in this README and scripts in package.json use pnpm. For full compatibility, please use pnpm v9.0.0 or higher as specified in the project configuration.
+
 ## Project Structure
 
 ```
@@ -81,12 +84,12 @@ The project uses SQLite with Prisma ORM:
 
 - Generate Prisma client
   ```bash
-  cd packages/database && npx prisma generate
+  cd packages/database && pnpm dlx prisma generate
   ```
 
 - Push schema changes to database
   ```bash
-  cd packages/database && npx prisma db push
+  cd packages/database && pnpm dlx prisma db push
   ```
 
 - Seed the database with test data
@@ -105,7 +108,7 @@ By default, Turborepo will cache locally. To enable Remote Caching you will need
 
 ```
 cd my-turborepo
-npx turbo login
+pnpm dlx turbo login
 ```
 
 This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
@@ -113,7 +116,7 @@ This will authenticate the Turborepo CLI with your [Vercel account](https://verc
 Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
 
 ```
-npx turbo link
+pnpm dlx turbo link
 ```
 
 ## Useful Links

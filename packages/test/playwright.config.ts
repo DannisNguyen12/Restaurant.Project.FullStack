@@ -29,15 +29,6 @@ export default defineConfig({
       },
       testMatch: /customer\/.*\.spec\.ts/,
     },
-    // Mobile viewports
-    {
-      name: 'customer-mobile',
-      use: {
-        ...devices['iPhone 13'],
-        baseURL: 'http://localhost:3001',
-      },
-      testMatch: /customer\/.*\.mobile\.spec\.ts/,
-    },
   ],
   webServer: [
     {

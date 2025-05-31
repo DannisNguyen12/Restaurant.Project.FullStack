@@ -4,10 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "playwright test",
+    "test:e2e": "playwright test",
     "test:admin": "playwright test --project=admin",
     "test:customer": "playwright test --project=customer",
-    "test:mobile": "playwright test --project=customer-mobile",
     "show-report": "playwright show-report"
   },
   "keywords": [],

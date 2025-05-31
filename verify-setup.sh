@@ -14,7 +14,7 @@ cd /workspaces/Project.Restaurant/Restaurant.Project.FullStack
 # Check database
 echo -e "\n📊 Checking database..."
 cd packages/database
-npx tsx src/check-db.ts
+pnpm dlx tsx src/check-db.ts
 if [ $? -ne 0 ]; then
   echo "❌ Database check failed!"
   exit 1

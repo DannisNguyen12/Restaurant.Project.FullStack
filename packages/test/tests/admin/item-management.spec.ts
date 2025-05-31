@@ -12,10 +12,9 @@ test.describe('Admin Item Management', () => {
     await page.locator('input[name="image"]').fill('https://restaurantwebsiteproject.s3.ap-southeast-2.amazonaws.com/e7ddae1f-399d-490a-acff-847131fd5cec.png');
     
     // Submit the form
+    const navigationPromise = page.waitForURL('/');
     await page.getByRole('button', { name: 'Create Item' }).click();
-    
-    // Check if redirected to dashboard
-    await expect(page).toHaveURL('/');
+    await navigationPromise;
     
     // Verify the new item appears on the dashboard
     const itemTitle = await page.getByRole('link', { name: 'Test Item' }).first();
@@ -38,10 +37,9 @@ test.describe('Admin Item Management', () => {
     await page.locator('input[name="price"]').first().fill('12.99');
     
     // Save changes
+    const navigationPromise = page.waitForURL('/');
     await page.getByRole('button', { name: 'Save Changes' }).click();
-    
-    // Check if redirected to dashboard
-    await expect(page).toHaveURL('/');
+    await navigationPromise;
     
     // Verify the updated item appears on the dashboard
     const updatedItemTitle = await page.getByRole('link', { name: 'Updated Pho Bo' }).first();

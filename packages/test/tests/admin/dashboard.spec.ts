@@ -17,8 +17,11 @@ async function loginAsAdmin(page: Page, credentials: Credentials = {
     await page.goto('/login');
     await page.getByLabel('Email address').fill(credentials.email);
     await page.getByLabel('Password').fill(credentials.password);
+    
+    // Click sign in and wait for navigation to complete
+    const navigationPromise = page.waitForURL('/');
     await page.getByRole('button', { name: /Sign in/i }).click();
-    await expect(page).toHaveURL('/');
+    await navigationPromise;
 }
 
 test.describe('Admin Dashboard', () => {
@@ -59,11 +62,10 @@ test.describe('Admin Dashboard', () => {
     await page.getByLabel('Email address').fill('admin@example.com');
     await page.getByLabel('Password').fill('123');
     
-    // Click sign in button
+    // Click sign in button and wait for navigation to complete
+    const navigationPromise = page.waitForURL('/');
     await page.getByRole('button', { name: /Sign in/i }).click();
-    
-    // Check if redirected to dashboard
-    await expect(page).toHaveURL('/');
+    await navigationPromise;
     
     // Verify we can see the create button (indicates successful login)
     const createButton = await page.getByRole('link', { name: '+ Create New Item' });

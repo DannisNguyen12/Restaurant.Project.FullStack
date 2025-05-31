@@ -5,7 +5,20 @@ import * as bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient()
 
-async function main() {
+export async function main() {
+   // Clear existing data in reverse order of dependencies
+  console.log('🗑️ Clearing existing data...');
+  await prisma.like.deleteMany({});
+  console.log('Deleted all likes.');
+  await prisma.item.deleteMany({});
+  console.log('Deleted all items.');
+  await prisma.user.deleteMany({});
+  console.log('Deleted all users.');
+  await prisma.category.deleteMany({});
+  console.log('Deleted all categories.');
+  console.log('✅ All existing data cleared.');
+  console.log('🌱 Starting database seeding...');
+
   console.log('🌱 Starting database seeding...');
 
   // Seed categories
