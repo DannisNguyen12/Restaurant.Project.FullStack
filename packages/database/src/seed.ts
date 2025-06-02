@@ -1,7 +1,7 @@
 // prisma/seed.ts
 
 import { PrismaClient } from '../generated/prisma'
-import * as bcrypt from 'bcryptjs';
+import { encryptPassword } from './encrypt';
 
 const prisma = new PrismaClient()
 
@@ -17,7 +17,7 @@ export async function main() {
   await prisma.category.deleteMany({});
   console.log('Deleted all categories.');
   console.log('✅ All existing data cleared.');
-
+  console.log('🌱 Starting database seeding...');
 
   console.log('🌱 Starting database seeding...');
 
@@ -112,9 +112,9 @@ export async function main() {
   );
 
   // Seed users
-  const hashedPassword1 = await bcrypt.hash('123', 10);
-  const hashedPassword2 = await bcrypt.hash('123', 10);
-  const hashedPasswordAdmin = await bcrypt.hash('123', 10);
+  const hashedPassword1 = await encryptPassword('123');
+  const hashedPassword2 = await encryptPassword('123');
+  const hashedPasswordAdmin = await encryptPassword('123');
   
   const user1 = await prisma.user.upsert({
     where: { email: 'alice@example.com' },
