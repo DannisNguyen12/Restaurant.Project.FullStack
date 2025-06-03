@@ -17,27 +17,19 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> 
     setError('')
 
     try {
-        const response = await fetch('/api/auth', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email, password }),
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.error || 'Login failed');
+        // Add your authentication logic here
+        // Example with a fake delay:
+        await new Promise<void>(resolve => setTimeout(resolve, 1000))
+        
+        if (email === 'demo@example.com' && password === 'password') {
+            router.push('/dashboard')
+        } else {
+            setError('Invalid email or password')
         }
-
-        // Redirect to dashboard on successful login
-        router.push('/');
-        router.refresh(); // Refresh to update auth state
-    } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred during login');
+    } catch {
+        setError('An error occurred during login')
     } finally {
-        setIsLoading(false);
+        setIsLoading(false)
     }
 }
 
