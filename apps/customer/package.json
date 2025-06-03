@@ -12,6 +12,11 @@
   },
   "dependencies": {
     "@repo/ui": "workspace:*",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.9",
+    "bcryptjs": "^3.0.2",
+    "cookies-next": "^6.0.0",
+    "jsonwebtoken": "^9.0.2",
     "next": "^15.3.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
