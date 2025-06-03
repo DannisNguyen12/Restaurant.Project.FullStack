@@ -10,7 +10,6 @@ export default function SignupForm() {
     email: '',
     password: '',
     confirmPassword: '',
-    newsletter: false
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [showPassword, setShowPassword] = useState(false);
@@ -22,7 +21,6 @@ interface SignupFormData {
     email: string;
     password: string;
     confirmPassword: string;
-    newsletter: boolean;
 }
 
 interface SignupFormErrors {
@@ -72,7 +70,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         setServerError('');
         
         try {
-            const response = await fetch('/api/signin', {
+            const response = await fetch('/api/signup', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -81,7 +79,6 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                     name: formData.name,
                     email: formData.email,
                     password: formData.password,
-                    newsletter: formData.newsletter
                 }),
             });
             
@@ -221,20 +218,6 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                 <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>
               )}
             </div>
-          </div>
-
-          <div className="flex items-center">
-            <input
-              id="newsletter"
-              name="newsletter"
-              type="checkbox"
-              checked={formData.newsletter}
-              onChange={handleChange}
-              className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-            />
-            <label htmlFor="newsletter" className="ml-2 block text-sm text-gray-900">
-              Subscribe to our newsletter for tips & updates
-            </label>
           </div>
 
           <div>
