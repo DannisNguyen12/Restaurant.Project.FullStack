@@ -1,6 +1,5 @@
 'use client';
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 // Define category interface
@@ -71,13 +70,6 @@ export default function StaticSidebar({ onCategorySelect, selectedCategoryId }: 
     }
   };
   
-  const handleCategoryClick = (categoryId: number, e: React.MouseEvent) => {
-    if (onCategorySelect) {
-      e.preventDefault();
-      onCategorySelect(categoryId);
-    }
-  };
-
   return (
     <div className="h-screen w-64 bg-gray-800 text-white flex flex-col">
       {/* Logo Section */}
@@ -103,23 +95,51 @@ export default function StaticSidebar({ onCategorySelect, selectedCategoryId }: 
                     ? 'bg-indigo-600 text-white' 
                     : 'text-gray-400 hover:text-white hover:bg-gray-700'
                 }`}
+                aria-current={selectedCategoryId === 0 ? 'page' : undefined}
               >
+                <svg 
+                  className="mr-2 h-5 w-5" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                </svg>
                 <span>All Items</span>
+                {selectedCategoryId === 0 && (
+                  <span className="ml-auto flex items-center">
+                    <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </span>
+                )}
               </button>
             </li>
             {categories.map((category) => (
               <li key={category.id}>
-                <Link
-                  href={`/category/${category.id}`}
-                  onClick={(e) => handleCategoryClick(category.id, e)}
+                <button
+                  onClick={() => onCategorySelect?.(category.id)}
                   className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${
                     selectedCategoryId === category.id 
                       ? 'bg-indigo-600 text-white' 
                       : 'text-gray-400 hover:text-white hover:bg-gray-700'
                   }`}
+                  aria-current={selectedCategoryId === category.id ? 'page' : undefined}
                 >
                   <span>{category.name}</span>
-                </Link>
+                  {selectedCategoryId === category.id && (
+                    <span className="ml-auto flex items-center">
+                      <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </span>
+                  )}
+                </button>
               </li>
             ))}
           </ul>

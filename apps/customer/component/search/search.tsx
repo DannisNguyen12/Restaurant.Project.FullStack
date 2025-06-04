@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 
-interface SearchItem {
+export interface SearchItem {
   id: number;
   name: string;
   description: string;
@@ -9,6 +9,7 @@ interface SearchItem {
   image: string | null;
   category: {
     name: string;
+    id?: number;
   };
 }
 
@@ -80,14 +81,14 @@ export default function TopSearchBar({ onSearch, onItemsFound }: TopSearchBarPro
 
   return (
     <header className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 xl:px-8">
+        <div className="flex items-center justify-between h-12 sm:h-14 lg:h-16">
           {/* Search Form */}
-          <form onSubmit={handleSubmit} className="flex-1 max-w-2xl mx-auto">
+          <form onSubmit={handleSubmit} className="flex-1 max-w-sm sm:max-w-md lg:max-w-2xl mx-auto">
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <div className="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
                 <svg 
-                  className="h-5 w-5 text-gray-400" 
+                  className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" 
                   fill="none" 
                   stroke="currentColor" 
                   viewBox="0 0 24 24"
@@ -106,7 +107,7 @@ export default function TopSearchBar({ onSearch, onItemsFound }: TopSearchBarPro
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search for menu items..."
-                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                className="block w-full pl-8 sm:pl-10 pr-8 sm:pr-10 py-1.5 sm:py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm sm:text-base"
               />
               
               {searchQuery && (
@@ -119,10 +120,10 @@ export default function TopSearchBar({ onSearch, onItemsFound }: TopSearchBarPro
                     setLastQuery(null);
                     onItemsFoundRef.current?.([]);
                   }}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  className="absolute inset-y-0 right-0 pr-2 sm:pr-3 flex items-center"
                 >
                   <svg 
-                    className="h-5 w-5 text-gray-400 hover:text-gray-600" 
+                    className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 hover:text-gray-600" 
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24"
@@ -139,11 +140,11 @@ export default function TopSearchBar({ onSearch, onItemsFound }: TopSearchBarPro
               
               {/* Search results dropdown */}
               {showDropdown && searchResults.length > 0 && (
-                <div className="absolute top-10 w-full bg-white rounded-md shadow-lg border border-gray-200 z-20 max-h-80 overflow-y-auto">
-                  <div className="p-2">
+                <div className="absolute top-8 sm:top-10 w-full bg-white rounded-md shadow-lg border border-gray-200 z-20 max-h-60 sm:max-h-80 overflow-y-auto">
+                  <div className="p-1 sm:p-2">
                     {isLoading ? (
-                      <div className="flex justify-center p-4">
-                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-500"></div>
+                      <div className="flex justify-center p-3 sm:p-4">
+                        <div className="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 border-b-2 border-indigo-500"></div>
                       </div>
                     ) : (
                       searchResults.slice(0, 5).map((item) => (
@@ -155,11 +156,11 @@ export default function TopSearchBar({ onSearch, onItemsFound }: TopSearchBarPro
                             onSearchRef.current?.(item.name);
                           }}
                         >
-                          <div className="flex-1">
-                            <p className="font-medium text-gray-800">{item.name}</p>
-                            <p className="text-sm text-gray-500 truncate">{item.description}</p>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-gray-800 text-sm sm:text-base truncate">{item.name}</p>
+                            <p className="text-xs sm:text-sm text-gray-500 truncate">{item.description}</p>
                           </div>
-                          <span className="text-indigo-600 font-medium text-sm">${item.price.toFixed(2)}</span>
+                          <span className="text-indigo-600 font-medium text-xs sm:text-sm ml-2">${item.price.toFixed(2)}</span>
                         </div>
                       ))
                     )}
@@ -167,7 +168,7 @@ export default function TopSearchBar({ onSearch, onItemsFound }: TopSearchBarPro
                     {searchResults.length > 5 && (
                       <div className="p-2 text-center border-t border-gray-100">
                         <button 
-                          className="text-indigo-600 text-sm font-medium hover:text-indigo-800"
+                          className="text-indigo-600 text-xs sm:text-sm font-medium hover:text-indigo-800"
                           onClick={() => {
                             onSearch?.(searchQuery);
                             setShowDropdown(false);
