@@ -48,37 +48,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const validationErrors = validate();
 
-    if (Object.keys(validationErrors).length === 0) {
-      setIsLoading(true);
-      setServerError('');
-      
-      try {
-        const response = await fetch('/api/forgotpassword', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: formData.email,
-          }),
-        });
-        
-        const data = await response.json();
-        
-        if (!response.ok) {
-          throw new Error(data.error || 'An error occurred');
-        }
-        
-        // Email sent successfully
-        setEmailSent(true);
-      } catch (error) {
-        setServerError(error instanceof Error ? error.message : 'An error occurred');
-      } finally {
-        setIsLoading(false);
-      }
-    } else {
-      setErrors(validationErrors);
-    }
+
 };
 
   return (

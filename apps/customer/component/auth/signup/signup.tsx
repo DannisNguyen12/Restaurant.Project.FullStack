@@ -70,6 +70,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         setServerError('');
         
         try {
+            // Send the registration data to the API
             const response = await fetch('/api/signup', {
                 method: 'POST',
                 headers: {
@@ -84,15 +85,19 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
             
             const data = await response.json();
             
+            // Handle unsuccessful registration
             if (!response.ok) {
-                throw new Error(data.error || 'Failed to register');
+                setServerError(data.error || 'Failed to create account');
+                setIsLoading(false);
+                return;
             }
             
-            // Registration successful, redirect to login page
+            // On successful registration, redirect to login page
             router.push('/login?registered=true');
+            
         } catch (error) {
-            setServerError(error instanceof Error ? error.message : 'An error occurred');
-        } finally {
+            console.error('Registration error:', error);
+            setServerError('An unexpected error occurred. Please try again.');
             setIsLoading(false);
         }
     } else {

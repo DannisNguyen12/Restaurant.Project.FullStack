@@ -64,7 +64,8 @@ export default function ItemList({
     return renderSkeleton();
   }
 
-  if (items.length === 0) {
+  // Add null/undefined check before accessing length
+  if (!items || items.length === 0) {
     return (
       <div className="text-center py-16 bg-gray-50 rounded-lg my-8">
         <svg className="w-16 h-16 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -101,7 +102,9 @@ export default function ItemList({
                 <Image 
                   src={item.image} 
                   alt={item.name} 
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  width={500}   
+                  height={300} 
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
                 {addedItem === item.id && (
                   <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-60 rounded-xl">

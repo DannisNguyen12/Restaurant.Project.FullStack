@@ -1,36 +1,59 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
 export default function Login() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [successMessage, setSuccessMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+
+  useEffect(() => {
+    // Check if the user was redirected from registration
+    const registered = searchParams.get('registered')
+    if (registered === 'true') {
+      setSuccessMessage('Account created successfully! Please log in.')
+    }
+  }, [searchParams])
 
 const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault()
     setIsLoading(true)
     setError('')
+    setSuccessMessage('')
 
     try {
-        // Add your authentication logic here
-        // Example with a fake delay:
-        await new Promise<void>(resolve => setTimeout(resolve, 1000))
-        
-        if (email === 'demo@example.com' && password === 'password') {
-            router.push('/dashboard')
-        } else {
-            setError('Invalid email or password')
-        }
-    } catch {
-        setError('An error occurred during login')
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Login failed')
+      }
+
+      // On successful login, redirect to dashboard
+      router.push('/')
+      
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message)
+      } else {
+        setError('An unexpected error occurred')
+      }
     } finally {
-        setIsLoading(false)
+      setIsLoading(false)
     }
 }
 
@@ -52,6 +75,12 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> 
         {error && (
           <div className="bg-red-50 border-l-4 border-red-500 p-4">
             <p className="text-sm text-red-700">{error}</p>
+          </div>
+        )}
+
+        {successMessage && (
+          <div className="bg-green-50 border-l-4 border-green-500 p-4">
+            <p className="text-sm text-green-700">{successMessage}</p>
           </div>
         )}
 
