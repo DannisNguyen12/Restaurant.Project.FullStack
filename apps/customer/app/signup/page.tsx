@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import SignupForm from "../../components/signup/signup";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 
 export default function SignupPage() {
   const [loading, setLoading] = useState(false);

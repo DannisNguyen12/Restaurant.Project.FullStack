@@ -1,6 +1,6 @@
 import MenuItemDetail from "../../../components/item/detail";
 import { PrismaClient } from "@repo/database/generated/prisma";
-import { notFound } from "next/navigation";
+import { notFound } from "next/dist/client/components/not-found";
 
 interface DetailPageProps {
   params: { id: string };

@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+import { cookies } from 'next/headers';
 import Payment from "../../components/payment/payment";
 
 export default async function PaymentPage() {

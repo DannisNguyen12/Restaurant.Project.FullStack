@@ -38,9 +38,6 @@ importers:
       '@types/bcryptjs':
         specifier: ^3.0.0
         version: 3.0.0
-      '@types/jsonwebtoken':
-        specifier: ^9.0.9
-        version: 9.0.9
       bcryptjs:
         specifier: ^3.0.2
         version: 3.0.2
@@ -66,6 +63,9 @@ importers:
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
+      '@types/jsonwebtoken':
+        specifier: ^9.0.9
+        version: 9.0.9
       '@types/node':
         specifier: ^22.15.3
         version: 22.15.3
