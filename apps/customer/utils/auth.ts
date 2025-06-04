@@ -42,15 +42,21 @@ export const setAuthCookie = (token: string, cookieStore: any): void => {
     secure: process.env.NODE_ENV === 'production',
     maxAge: 60 * 10, // 10 minutes in seconds
     path: '/',
-    sameSite: 'strict',
+    sameSite: 'strict' as const,
   });
 };
 
 // Verify and decode JWT token from cookie
 export const verifyToken = (token: string): UserPayload | null => {
   try {
+    console.log('🔍 verifyToken called with token:', token.substring(0, 20) + '...');
+    console.log('🔑 JWT_SECRET exists:', !!JWT_SECRET);
+    
     if (!JWT_SECRET) throw new Error('JWT_SECRET is not defined');
+    
     const decoded = jwt.verify(token, JWT_SECRET as string) as TokenPayload;
+    console.log('✅ Token verified successfully:', { id: decoded.id, email: decoded.email, role: decoded.role });
+    
     if (
       typeof decoded === 'object' &&
       decoded !== null &&
@@ -64,28 +70,34 @@ export const verifyToken = (token: string): UserPayload | null => {
         role: decoded.role
       };
     }
+    console.log('❌ Token payload validation failed');
     return null;
-  } catch {
+  } catch (error: unknown) {
+    console.log('❌ Token verification error:', error);
     return null;
   }
 };
 
 // Get user from request cookies
 export const getUserFromCookies = (cookieStore: ReadonlyRequestCookies): UserPayload | null => {
-  const token = cookieStore.get(COOKIE_NAME)?.value;
+  // Check both cookie names for compatibility
+  let token = cookieStore.get(COOKIE_NAME)?.value;
+  if (!token) {
+    token = cookieStore.get('token')?.value;
+  }
   if (!token) return null;
   
   return verifyToken(token);
 };
 
-// Remove auth cookie
+// Remove auth cookie  
 export const removeAuthCookie = (cookieStore: any): void => {
   cookieStore.set(COOKIE_NAME, '', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     expires: new Date(0),
     path: '/',
-    sameSite: 'strict',
+    sameSite: 'strict' as const,
   });
 };
 

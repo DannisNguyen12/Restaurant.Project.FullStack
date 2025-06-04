@@ -44,10 +44,6 @@ export default function StaticSidebar({ onCategorySelect, selectedCategoryId }: 
     fetchCategories();
   }, []);
 
-  const handleSignIn = () => {
-    router.push('/login');
-  };
-
   const handleSignOut = async () => {
     try {
       // Call logout API to clear the cookie server-side
@@ -69,6 +65,8 @@ export default function StaticSidebar({ onCategorySelect, selectedCategoryId }: 
       console.error('Error during sign out:', error);
     }
   };
+  
+
   
   return (
     <div className="h-screen w-64 bg-gray-800 text-white flex flex-col">
@@ -146,7 +144,8 @@ export default function StaticSidebar({ onCategorySelect, selectedCategoryId }: 
         )}
       </nav>
 
-      {/* Auth Buttons */}
+
+      {/* Logout */}
       <div className="p-4 border-t border-gray-700">
           <button 
             type="button" 
@@ -155,15 +154,8 @@ export default function StaticSidebar({ onCategorySelect, selectedCategoryId }: 
           >
             Sign Out
           </button>
-
-          <button 
-            type="button" 
-            onClick={handleSignIn}
-            className="w-full py-2 px-4 text-sm bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors"
-          >
-            Sign In
-          </button>
       </div>
+
     </div>
   );
 }

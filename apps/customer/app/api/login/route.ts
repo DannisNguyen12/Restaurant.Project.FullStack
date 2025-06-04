@@ -51,14 +51,26 @@ export async function POST(request: Request) {
       }
     })
     
-    // Set HTTP-only cookie with JWT token
-    response.cookies.set('token', token, {
+    // Set HTTP-only cookie with JWT token for server-side access
+    response.cookies.set('auth_token', token, {
       httpOnly: true,
       maxAge: 60 * 60, // 1 hour in seconds
       path: '/',
       sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
+      secure: false, // Allow insecure cookies in development
     })
+    
+    // Also set a non-httpOnly cookie for client-side debugging
+    response.cookies.set('auth_debug', 'logged_in', {
+      httpOnly: false,
+      maxAge: 60 * 60,
+      path: '/',
+      sameSite: 'lax',
+      secure: false,
+    })
+    
+    console.log('Setting auth_token cookie with token:', token.substring(0, 20) + '...')
+    console.log('Cookie settings - secure:', false, 'sameSite:', 'lax')
     
     return response
   } catch (error) {

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from './utils/auth';
 
 // Define the protected paths that require authentication
-const protectedPaths = ['/dashboard', '/profile', '/checkout'];
+const protectedPaths = ['/checkout', '/payment'];
 
 export function middleware(request: NextRequest) {
   const token = request.cookies.get('auth_token')?.value;

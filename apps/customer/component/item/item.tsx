@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCart } from '../../context/CartContext';
+import { useToast } from '../../context/ToastContext';
 
 type ItemCardProps = {
   id: number;
@@ -20,11 +21,15 @@ export default function Item({
   price
 }: ItemCardProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const { addToCart } = useCart();
+  const { addToCart, isItemInCart } = useCart();
+  const { addToast } = useToast();
 
   const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>): void => {
     e.preventDefault();
     setIsLoading(true);
+    
+    // Check if item is already in cart to determine message
+    const itemAlreadyInCart = isItemInCart(id);
     
     // Add item to cart using context
     try {
@@ -37,11 +42,24 @@ export default function Item({
       });
       
       // Show success feedback
+      addToast({
+        type: 'success',
+        title: itemAlreadyInCart ? 'Quantity Updated' : 'Added to Cart',
+        message: itemAlreadyInCart 
+          ? `${name} quantity increased in your cart`
+          : `${name} has been added to your cart`
+      });
+      
       setTimeout(() => {
         setIsLoading(false);
       }, 300);
     } catch (error) {
       console.error('Error adding item to cart:', error);
+      addToast({
+        type: 'error',
+        title: 'Error',
+        message: 'Unable to add item to cart. Please try again.'
+      });
       setIsLoading(false);
     }
   };

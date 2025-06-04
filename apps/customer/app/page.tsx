@@ -1,9 +1,10 @@
 'use client';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import StaticSidebar from '../component/leftmenu/leftMenu';
 import TopSearchBar from '../component/search/search';
 import HomeContent from '../component/home/homeContent';
 import CartSummary from '../component/cart/cart';
+import { useAuth } from '../hooks/useAuth';
 
 // Import SearchItem interface from the component that defines it
 import { SearchItem } from '../component/search/search';
@@ -13,6 +14,21 @@ export default function HomePage() {
   const [searchResults, setSearchResults] = useState<SearchItem[] | null>(null);
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const { user, isAuthenticated, logout } = useAuth();
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  // Close user menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setIsUserMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Memoize these callbacks to prevent recreating them on every render
   const handleCategorySelect = useCallback((categoryId: number) => {
@@ -75,11 +91,76 @@ export default function HomePage() {
       
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top Search Bar */}
-        <TopSearchBar 
-          onSearch={handleSearch}
-          onItemsFound={handleItemsFound}
-        />
+        {/* Header with Search Bar and User Menu */}
+        <div className="flex items-center justify-between gap-4 p-2 sm:p-4 lg:p-6 bg-white shadow-sm border-b">
+          <div className="flex-1">
+            <TopSearchBar 
+              onSearch={handleSearch}
+              onItemsFound={handleItemsFound}
+            />
+          </div>
+          
+          {/* User Menu */}
+          {isAuthenticated ? (
+            <div className="relative" ref={userMenuRef}>
+              <button
+                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center">
+                  <span className="text-white text-sm font-semibold">
+                    {user?.email?.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+                <span className="hidden sm:block text-sm font-medium text-gray-700">
+                  {user?.email}
+                </span>
+                <svg 
+                  className="w-4 h-4 text-gray-500" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              
+              {isUserMenuOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border z-50">
+                  <div className="py-1">
+                    <div className="px-4 py-2 text-sm text-gray-500 border-b">
+                      Signed in as {user?.email}
+                    </div>
+                    <button
+                      onClick={async () => {
+                        await logout();
+                        setIsUserMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="flex items-center space-x-2">
+              <a
+                href="/login"
+                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors"
+              >
+                Sign In
+              </a>
+              <a
+                href="/signup"
+                className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
+              >
+                Sign Up
+              </a>
+            </div>
+          )}
+        </div>
         
         {/* Content Area with Cart */}
         <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">

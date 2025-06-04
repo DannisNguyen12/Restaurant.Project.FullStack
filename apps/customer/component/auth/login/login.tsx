@@ -3,10 +3,12 @@
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import { useAuth } from '../../../hooks/useAuth'
 
 export default function Login() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { login, isLoading: authLoading } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -29,23 +31,21 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> 
     setSuccessMessage('')
 
     try {
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      })
+      const result = await login(email, password)
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Login failed')
+      if (result.success) {
+        // Check if user was redirected from checkout
+        const from = searchParams.get('from')
+        if (from) {
+          // Redirect back to where they came from
+          router.push(from)
+        } else {
+          // Default redirect to homepage
+          router.push('/')
+        }
+      } else {
+        setError(result.error || 'Login failed')
       }
-
-      // On successful login, redirect to dashboard
-      router.push('/')
-      
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message)
@@ -65,7 +65,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> 
             Sign in to your account
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <Link href="/signup" className="font-medium text-indigo-600 hover:text-indigo-500">
               Sign up
             </Link>

@@ -1,19 +1,27 @@
 'use client';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../hooks/useAuth';
+import { useToast } from '../../context/ToastContext';
 
 export default function CartSummary() {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
+  const router = useRouter();
   const { 
     cartItems, 
     updateQuantity, 
     removeFromCart, 
+    clearCart,
     getCartSubtotal, 
     getCartTax, 
     getCartTotal,
     getCartItemCount 
   } = useCart();
+  const { isAuthenticated, isLoading } = useAuth();
+  const { addToast } = useToast();
 
   // Calculate totals using context methods
   const subtotal = getCartSubtotal();
@@ -21,9 +29,84 @@ export default function CartSummary() {
   const total = getCartTotal();
   const itemCount = getCartItemCount();
 
-  const handleCheckout = () => {
-    console.log('Proceeding to checkout with items:', cartItems);
-    // TODO: Implement checkout functionality
+  const handleUpdateQuantity = (itemId: number, newQuantity: number, itemName: string) => {
+    const oldQuantity = cartItems.find(item => item.id === itemId)?.quantity || 0;
+    updateQuantity(itemId, newQuantity);
+    
+    if (newQuantity > oldQuantity) {
+      addToast({
+        type: 'success',
+        title: 'Quantity Updated',
+        message: `Increased ${itemName} quantity to ${newQuantity}`
+      });
+    } else if (newQuantity < oldQuantity && newQuantity > 0) {
+      addToast({
+        type: 'info',
+        title: 'Quantity Updated',
+        message: `Decreased ${itemName} quantity to ${newQuantity}`
+      });
+    }
+  };
+
+  const handleRemoveFromCart = (itemId: number, itemName: string) => {
+    removeFromCart(itemId);
+    addToast({
+      type: 'warning',
+      title: 'Item Removed',
+      message: `${itemName} has been removed from your cart`
+    });
+  };
+
+  const handleClearCart = () => {
+    if (cartItems.length === 0) {
+      addToast({
+        type: 'info',
+        title: 'Cart Already Empty',
+        message: 'Your cart is already empty'
+      });
+      return;
+    }
+
+    // Simple confirmation - in a real app you might use a modal
+    if (window.confirm('Are you sure you want to clear your cart?')) {
+      clearCart();
+      addToast({
+        type: 'warning',
+        title: 'Cart Cleared',
+        message: 'All items have been removed from your cart'
+      });
+    }
+  };
+
+  const handleCheckout = async () => {
+    if (cartItems.length === 0) {
+      addToast({
+        type: 'warning',
+        title: 'Empty Cart',
+        message: 'Please add some items to your cart before checkout'
+      });
+      return;
+    }
+
+    setIsNavigating(true);
+
+    if (!isAuthenticated) {
+      addToast({
+        type: 'info',
+        title: 'Sign In Required',
+        message: 'Please sign in to proceed with checkout'
+      });
+      // Redirect to login with return URL
+      router.push('/login?from=/payment');
+    } else {
+      addToast({
+        type: 'info',
+        title: 'Redirecting...',
+        message: 'Taking you to checkout'
+      });
+      // Redirect to payment page
+      router.push('/payment');
+    }
   };
 
   return (
@@ -39,22 +122,41 @@ export default function CartSummary() {
               {itemCount}
             </span>
           )}
-        </div>
-        <button 
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="text-gray-500 hover:text-gray-700 p-1.5 sm:p-2 rounded-md hover:bg-gray-100 transition-colors flex-shrink-0"
-          aria-label={isCollapsed ? "Expand cart" : "Collapse cart"}
-        >
-          {isCollapsed ? (
-            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          ) : (
-            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7" />
-            </svg>
+          {isAuthenticated && !isLoading && (
+            <span className="hidden sm:inline text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full flex-shrink-0">
+              ✓ Signed In
+            </span>
           )}
-        </button>
+        </div>
+        <div className="flex items-center space-x-1 sm:space-x-2">
+          {cartItems.length > 0 && (
+            <button 
+              onClick={handleClearCart}
+              className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 sm:p-2 rounded-md transition-colors flex-shrink-0"
+              aria-label="Clear cart"
+              title="Clear cart"
+            >
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          )}
+          <button 
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="text-gray-500 hover:text-gray-700 p-1.5 sm:p-2 rounded-md hover:bg-gray-100 transition-colors flex-shrink-0"
+            aria-label={isCollapsed ? "Expand cart" : "Collapse cart"}
+          >
+            {isCollapsed ? (
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7" />
+              </svg>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Cart Items (hidden when collapsed) */}
@@ -88,7 +190,7 @@ export default function CartSummary() {
                   <div className="flex flex-col items-end gap-1 sm:gap-2 flex-shrink-0">
                     <div className="flex items-center gap-0.5 sm:gap-1">
                       <button 
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        onClick={() => handleUpdateQuantity(item.id, item.quantity - 1, item.name)}
                         className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 font-medium transition-colors text-sm sm:text-base"
                         aria-label="Decrease quantity"
                       >
@@ -96,7 +198,7 @@ export default function CartSummary() {
                       </button>
                       <span className="w-6 sm:w-8 text-center text-sm sm:text-base font-medium">{item.quantity}</span>
                       <button 
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        onClick={() => handleUpdateQuantity(item.id, item.quantity + 1, item.name)}
                         className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 font-medium transition-colors text-sm sm:text-base"
                         aria-label="Increase quantity"
                       >
@@ -104,7 +206,7 @@ export default function CartSummary() {
                       </button>
                     </div>
                     <button 
-                      onClick={() => removeFromCart(item.id)}
+                      onClick={() => handleRemoveFromCart(item.id, item.name)}
                       className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1 sm:p-1.5 rounded-full transition-colors"
                       aria-label="Remove item"
                     >
@@ -138,10 +240,30 @@ export default function CartSummary() {
               
               <button 
                 onClick={handleCheckout}
-                className="mt-4 sm:mt-6 w-full py-2.5 sm:py-3 lg:py-4 rounded-lg font-semibold text-white text-sm sm:text-base bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-[1.01] shadow-md hover:shadow-lg"
+                disabled={cartItems.length === 0 || isLoading || isNavigating}
+                className="mt-4 sm:mt-6 w-full py-2.5 sm:py-3 lg:py-4 rounded-lg font-semibold text-white text-sm sm:text-base bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-[1.01] shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:hover:scale-100"
               >
-                <span className="hidden sm:inline">Proceed to Checkout (${total.toFixed(2)})</span>
-                <span className="sm:hidden">Checkout (${total.toFixed(2)})</span>
+                {isLoading ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Loading...</span>
+                  </div>
+                ) : isNavigating ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span className="hidden sm:inline">Redirecting...</span>
+                    <span className="sm:hidden">Loading...</span>
+                  </div>
+                ) : (
+                  <>
+                    <span className="hidden sm:inline">
+                      {!isAuthenticated ? 'Sign In to Checkout' : `Proceed to Checkout ($${total.toFixed(2)})`}
+                    </span>
+                    <span className="sm:hidden">
+                      {!isAuthenticated ? 'Sign In' : `Checkout ($${total.toFixed(2)})`}
+                    </span>
+                  </>
+                )}
               </button>
             </div>
           )}
