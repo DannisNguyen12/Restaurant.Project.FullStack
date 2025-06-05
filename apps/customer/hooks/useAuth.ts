@@ -4,8 +4,6 @@ import { UserPayload } from '../utils/auth';
 import { useToast } from '../context/ToastContext';
 
 export const useAuth = () => {
-  const [user, setUser] = useState<UserPayload | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { addToast } = useToast();
 
