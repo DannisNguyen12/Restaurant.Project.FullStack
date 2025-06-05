@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '../auth/[...nextauth]/route';
+import { authOptions } from '../../../auth.config';
 import { prisma } from '../../../../../packages/database/src/index';
 
 interface CartItem {
@@ -201,7 +201,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Get the session to verify authentication
     const session = await getServerSession(authOptions);
