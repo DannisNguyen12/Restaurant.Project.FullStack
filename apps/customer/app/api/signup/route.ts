@@ -1,62 +1,72 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { hashPassword } from '../../../utils/auth';
-import { prisma } from '../../../../../packages/database/src/index';
+import { NextResponse } from 'next/server'
+import bcrypt from 'bcryptjs'
+import { prisma } from '../../../../../packages/database/src/index'
 
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { name, email, password } = body;
-
+    const { name, email, password } = await request.json()
+    
     // Validate input
     if (!name || !email || !password) {
-      return NextResponse.json(
-        { error: 'Name, email and password are required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Name, email and password are required' }, { status: 400 })
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      return NextResponse.json({ error: 'Please enter a valid email address' }, { status: 400 })
+    }
+
+    // Validate password length
+    if (password.length < 6) {
+      return NextResponse.json({ error: 'Password must be at least 6 characters long' }, { status: 400 })
     }
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
-      where: { email }
-    });
+      where: { email: email.toLowerCase() }
+    })
 
     if (existingUser) {
-      return NextResponse.json(
-        { error: 'User with this email already exists' },
-        { status: 409 }
-      );
+      return NextResponse.json({ error: 'A user with this email already exists' }, { status: 409 })
     }
 
-    // Hash password
-    const hashedPassword = await hashPassword(password);
+    // Hash the password
+    const saltRounds = 12
+    const hashedPassword = await bcrypt.hash(password, saltRounds)
 
-    // Create new user
-    const newUser = await prisma.user.create({
+    // Create the user
+    const user = await prisma.user.create({
       data: {
-        name,
-        email,
+        name: name.trim(),
+        email: email.toLowerCase().trim(),
         password: hashedPassword,
-        role: 'USER',
-        // We'll need to add the newsletterOptIn field to the schema later
+        role: 'USER'
       }
-    });
+    })
 
-    // Return success without exposing password
+    console.log('User created successfully:', user.email)
+
+    // Return success response (don't include password)
     return NextResponse.json({
       success: true,
+      message: 'Account created successfully',
       user: {
-        id: newUser.id,
-        name: newUser.name,
-        email: newUser.email,
-        role: newUser.role
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role
       }
-    }, { status: 201 });
+    }, { status: 201 })
+
   } catch (error) {
-    console.error('Registration error:', error);
+    console.error('Signup error:', error)
     
-    return NextResponse.json(
-      { error: 'Failed to create user account' },
-      { status: 500 }
-    );
+    // Handle Prisma unique constraint error
+    if (error instanceof Error && error.message.includes('Unique constraint')) {
+      return NextResponse.json({ error: 'A user with this email already exists' }, { status: 409 })
+    }
+    
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

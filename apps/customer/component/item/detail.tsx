@@ -9,9 +9,9 @@ type Item = {
   fullDescription: string;
   price: number;
   image: string | null;
-  ingredients?: string[] | string | null; // Added
-  servingTips?: string[] | string | null; // Added
-  recommendations?: string[] | string | null; // Added
+  ingredients?: string[] | string | null; 
+  servingTips?: string[] | string | null; 
+  recommendations?: string[] | string | null; 
   category: {
     id: number;
     name: string;

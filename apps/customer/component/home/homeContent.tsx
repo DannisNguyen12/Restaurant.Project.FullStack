@@ -62,8 +62,6 @@ export default function HomeContent({ categoryId, searchResults, searchQuery }: 
         // Set initial items
         setItems(processedItems);
         setInitialLoadComplete(true);
-        
-        console.log(`Loaded ${processedItems.length} items for initial view`);
       } catch (err) {
         console.error('Error fetching initial data:', err);
         setError('Failed to load menu data');
@@ -104,8 +102,6 @@ export default function HomeContent({ categoryId, searchResults, searchQuery }: 
       setError(null); // Clear any previous errors
       
       try {
-        console.log(`Fetching items for category ID: ${categoryId}`);
-        
         // If categoryId is 0 or null, fetch all items
         if (!categoryId || categoryId === 0) {
           const response = await fetch('/api/items');
@@ -155,7 +151,6 @@ export default function HomeContent({ categoryId, searchResults, searchQuery }: 
           })));
           
           setTitle(categoryData.name || 'Category Items');
-          console.log(`Loaded ${itemsData.length} items for category: ${categoryData.name}`);
         }
         
         // Update the last fetched category ID

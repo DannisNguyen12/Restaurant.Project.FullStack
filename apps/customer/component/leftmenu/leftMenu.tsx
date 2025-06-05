@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { signOut } from 'next-auth/react';
 
 // Define category interface
 interface Category {
@@ -46,21 +47,9 @@ export default function StaticSidebar({ onCategorySelect, selectedCategoryId }: 
 
   const handleSignOut = async () => {
     try {
-      // Call logout API to clear the cookie server-side
-      const response = await fetch('/api/logout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (response.ok) {
-        router.push('/');
-        
-        console.log('User signed out successfully');
-      } else {
-        console.error('Failed to sign out');
-      }
+      // Use NextAuth's signOut function
+      await signOut({ redirect: false });
+      router.push('/');
     } catch (error) {
       console.error('Error during sign out:', error);
     }

@@ -1,49 +1,87 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { verifyToken } from './utils/auth';
+import { NextResponse } from "next/server"
+import type { NextRequest } from "next/server"
+import { getToken } from "next-auth/jwt"
 
-// Define the protected paths that require authentication
-const protectedPaths = ['/checkout', '/payment'];
+// Define protected routes - only authenticated users can access these
+const protectedRoutes = ['/checkout', '/payment']
 
-export function middleware(request: NextRequest) {
-  const token = request.cookies.get('auth_token')?.value;
-  const { pathname } = request.nextUrl;
-
-  // Check if the requested path is protected
-  const isProtectedPath = protectedPaths.some(path => 
-    pathname === path || pathname.startsWith(`${path}/`)
-  );
-
-  // If no token exists and the path is protected, redirect to login
-  if (isProtectedPath && !token) {
-    const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('from', pathname);
-    return NextResponse.redirect(loginUrl);
+export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl
+  
+  // Check if the current path is a protected route
+  const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route))
+  
+  if (!isProtectedRoute) {
+    return NextResponse.next()
   }
 
-  // If token exists but is invalid and the path is protected, redirect to login
-  if (isProtectedPath && token) {
-    const user = verifyToken(token);
-    if (!user) {
-      const loginUrl = new URL('/login', request.url);
-      loginUrl.searchParams.set('from', pathname);
-      return NextResponse.redirect(loginUrl);
+  console.log(`Checking authentication for protected route: ${pathname}`)
+
+  // Check for authentication using multiple methods
+  let isAuthenticated = false
+  let authMethod = ''
+  
+  // Method 1: Check for custom auth session cookie (simple cookie check)
+  const userSessionCookie = request.cookies.get('user_session')?.value
+  
+  if (userSessionCookie) {
+    try {
+      const userSession = JSON.parse(decodeURIComponent(userSessionCookie))
+      if (userSession && userSession.id && userSession.email) {
+        isAuthenticated = true
+        authMethod = 'CustomAuth'
+        console.log(`User authenticated via custom session: ${userSession.email}`)
+      }
+    } catch (error) {
+      console.log('Custom session parsing failed:', error)
+    }
+  }
+  
+  // Method 2: Check for NextAuth session token (for OAuth providers)
+  if (!isAuthenticated) {
+    try {
+      const token = await getToken({ 
+        req: request, 
+        secret: process.env.NEXTAUTH_SECRET 
+      })
+      
+      if (token && token.email) {
+        isAuthenticated = true
+        authMethod = 'NextAuth'
+        console.log(`User authenticated via NextAuth token: ${token.email}`)
+      }
+    } catch (error) {
+      console.log('NextAuth token verification failed:', error)
     }
   }
 
-  // Continue with the request
-  return NextResponse.next();
+  // If user is not authenticated, redirect to signin
+  if (!isAuthenticated) {
+    const signinUrl = new URL('/signin', request.url)
+    signinUrl.searchParams.set('callbackUrl', pathname)
+    
+    console.log(`Redirecting unauthenticated user from ${pathname} to signin`)
+    
+    // Create redirect response and clear any invalid tokens
+    const response = NextResponse.redirect(signinUrl)
+    
+    // Clear potentially invalid cookies
+    response.cookies.delete('auth_token')
+    response.cookies.delete('user_session')
+    
+    return response
+  }
+
+  // User is authenticated, allow access
+  console.log(`Allowing authenticated access to ${pathname} via ${authMethod}`)
+  return NextResponse.next()
 }
 
+// Specify which routes this middleware should run on
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
-    '/((?!api|_next/static|_next/image|favicon.ico|public).*)',
-  ],
-};
+    // Protected routes
+    '/checkout/:path*',
+    '/payment/:path*',
+  ]
+}

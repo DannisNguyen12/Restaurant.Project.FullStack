@@ -3,6 +3,9 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { CartProvider } from "../context/CartContext";
 import { ToastProvider } from "../context/ToastContext";
+import { getServerSession } from "next-auth";
+import SessionProvider from "../component/SessionProvider";
+
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -18,19 +21,23 @@ export const metadata: Metadata = {
   description: "Explore our delicious menu of authentic Vietnamese dishes. Order online for pickup or delivery.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await getServerSession();
+  
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <ToastProvider>
-          <CartProvider>
-            {children}
-          </CartProvider>
-        </ToastProvider>
+        <SessionProvider session={session}>
+          <ToastProvider>
+            <CartProvider>
+              {children}
+            </CartProvider>
+          </ToastProvider>
+        </SessionProvider>
       </body>
     </html>
   );

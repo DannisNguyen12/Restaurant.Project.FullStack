@@ -1,13 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import ItemDetail from '../../../component/item/detail';
 import Link from 'next/link';
 
 export default function ItemDetailPage() {
   const params = useParams();
-  const router = useRouter();
   const itemId = typeof params.id === 'string' ? parseInt(params.id) : undefined;
   
   if (!itemId || isNaN(itemId)) {

@@ -1,8 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { useCart } from '../../context/CartContext';
-import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../context/ToastContext';
 import Image from 'next/image';
 
@@ -22,7 +22,10 @@ interface PaymentForm {
 export default function PaymentPage() {
   const router = useRouter();
   const { cartItems, getCartTotal, clearCart } = useCart();
-  const { user, isLoading, isAuthenticated } = useAuth();
+  const { data: session, status } = useSession();
+  const user = session?.user;
+  const isLoading = status === 'loading';
+  const isAuthenticated = status === 'authenticated';
   const { addToast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -44,7 +47,7 @@ export default function PaymentPage() {
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.push('/login?from=/payment');
+      router.push('/signin?callbackUrl=/payment');
     }
     
     if (cartItems.length === 0) {
@@ -55,7 +58,7 @@ export default function PaymentPage() {
     if (user) {
       setPaymentForm(prev => ({
         ...prev,
-        email: user.email,
+        email: user.email || '',
       }));
     }
   }, [isLoading, isAuthenticated, cartItems.length, router, user]);

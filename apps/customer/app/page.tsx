@@ -1,10 +1,10 @@
 'use client';
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { useSession, signOut } from 'next-auth/react';
 import StaticSidebar from '../component/leftmenu/leftMenu';
 import TopSearchBar from '../component/search/search';
 import HomeContent from '../component/home/homeContent';
 import CartSummary from '../component/cart/cart';
-import { useAuth } from '../hooks/useAuth';
 
 // Import SearchItem interface from the component that defines it
 import { SearchItem } from '../component/search/search';
@@ -15,7 +15,9 @@ export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const { user, isAuthenticated, logout } = useAuth();
+  const { data: session, status } = useSession();
+  const user = session?.user;
+  const isAuthenticated = status === 'authenticated';
   const userMenuRef = useRef<HTMLDivElement>(null);
 
   // Close user menu when clicking outside
@@ -133,7 +135,7 @@ export default function HomePage() {
                     </div>
                     <button
                       onClick={async () => {
-                        await logout();
+                        await signOut();
                         setIsUserMenuOpen(false);
                       }}
                       className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
@@ -147,7 +149,7 @@ export default function HomePage() {
           ) : (
             <div className="flex items-center space-x-2">
               <a
-                href="/login"
+                href="/signin"
                 className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors"
               >
                 Sign In

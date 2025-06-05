@@ -3,10 +3,10 @@ import { prisma } from '../../../../../../../packages/database/src/index';
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = await params.id;
+    const { id } = await params;
     const categoryId = parseInt(id);
     
     if (isNaN(categoryId)) {
