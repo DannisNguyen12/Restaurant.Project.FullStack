@@ -340,8 +340,13 @@ export default function PaymentPage() {
                         value={paymentForm.phone}
                         onChange={handleInputChange}
                         required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${
+                          errors.phone ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                        }`}
                       />
+                      {errors.phone && (
+                        <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -353,8 +358,13 @@ export default function PaymentPage() {
                         value={paymentForm.address}
                         onChange={handleInputChange}
                         required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${
+                          errors.address ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                        }`}
                       />
+                      {errors.address && (
+                        <p className="mt-1 text-sm text-red-600">{errors.address}</p>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -366,8 +376,13 @@ export default function PaymentPage() {
                         value={paymentForm.city}
                         onChange={handleInputChange}
                         required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${
+                          errors.city ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                        }`}
                       />
+                      {errors.city && (
+                        <p className="mt-1 text-sm text-red-600">{errors.city}</p>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -379,8 +394,13 @@ export default function PaymentPage() {
                         value={paymentForm.zipCode}
                         onChange={handleInputChange}
                         required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${
+                          errors.zipCode ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                        }`}
                       />
+                      {errors.zipCode && (
+                        <p className="mt-1 text-sm text-red-600">{errors.zipCode}</p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -400,8 +420,13 @@ export default function PaymentPage() {
                         onChange={handleInputChange}
                         placeholder="1234 5678 9012 3456"
                         required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${
+                          errors.cardNumber ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                        }`}
                       />
+                      {errors.cardNumber && (
+                        <p className="mt-1 text-sm text-red-600">{errors.cardNumber}</p>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -414,8 +439,13 @@ export default function PaymentPage() {
                         onChange={handleInputChange}
                         placeholder="MM/YY"
                         required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${
+                          errors.expiryDate ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                        }`}
                       />
+                      {errors.expiryDate && (
+                        <p className="mt-1 text-sm text-red-600">{errors.expiryDate}</p>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -428,8 +458,13 @@ export default function PaymentPage() {
                         onChange={handleInputChange}
                         placeholder="123"
                         required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${
+                          errors.cvv ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                        }`}
                       />
+                      {errors.cvv && (
+                        <p className="mt-1 text-sm text-red-600">{errors.cvv}</p>
+                      )}
                     </div>
                     <div className="sm:col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -441,8 +476,13 @@ export default function PaymentPage() {
                         value={paymentForm.cardName}
                         onChange={handleInputChange}
                         required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${
+                          errors.cardName ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                        }`}
                       />
+                      {errors.cardName && (
+                        <p className="mt-1 text-sm text-red-600">{errors.cardName}</p>
+                      )}
                     </div>
                   </div>
                 </div>

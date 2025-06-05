@@ -6,7 +6,7 @@ import { prisma } from "../../../../../../packages/database/src/index";
 import { compare } from "bcryptjs";
 import type { NextAuthOptions } from "next-auth";
 
-const authOptions: NextAuthOptions = {
+export const authOptions: NextAuthOptions = {
     providers: [
         GitHubProvider({
             clientId: process.env.GITHUB_CLIENT_ID || "",
