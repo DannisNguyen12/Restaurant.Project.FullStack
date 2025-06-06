@@ -1,6 +1,5 @@
 {
   "buildCommand": "pnpm --filter database exec prisma generate && pnpm run build",
   "outputDirectory": ".next",
-  "framework": "nextjs",
-  "ignoreCommand": "git diff --quiet $(git rev-list --max-parents=0 HEAD)..HEAD -- apps/admin packages"
+  "framework": "nextjs"
 }
