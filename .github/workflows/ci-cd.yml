@@ -218,12 +218,12 @@ jobs:
       - name: Deploy to production
         run: |
           echo "Deployment would happen here"
-          # For example, if deploying to Vercel:
+          # Uncomment and configure when ready to deploy to Vercel:
           # - name: Deploy to Vercel
           #   uses: amondnet/vercel-action@v20
           #   with:
-          #     vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          #     vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          #     vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_CUSTOMER }}
+          #     vercel-token: ${{ secrets.VERCEL_TOKEN_SECRET }}
+          #     vercel-org-id: ${{ secrets.VERCEL_ORG_ID_SECRET }}
+          #     vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_CUSTOMER_SECRET }}
           #     working-directory: ./apps/customer
           #     vercel-args: '--prod'
