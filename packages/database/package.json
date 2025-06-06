@@ -2,12 +2,12 @@
   "name": "database",
   "version": "0.0.0",
   "scripts": {
-    "db:generate": "prisma generate",
-    "db:push": "prisma db push",
-    "db:seed": "ts-node src/seed.ts",
-    "db:studio": "prisma studio",
-    "postinstall": "prisma generate",
-    "build": "prisma generate"
+    "db:generate": "npx prisma generate",
+    "db:push": "npx prisma db push",
+    "db:seed": "npx ts-node src/seed.ts",
+    "db:studio": "npx prisma studio",
+    "postinstall": "npx prisma generate",
+    "build": "npx prisma generate"
   },
   "devDependencies": {
     "@types/node": "^22.15.3",
