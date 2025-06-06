@@ -1,13 +1,21 @@
 {
   "name": "database",
   "version": "0.0.0",
+  "scripts": {
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:seed": "ts-node src/seed.ts",
+    "db:studio": "prisma studio",
+    "postinstall": "prisma generate",
+    "build": "prisma generate"
+  },
   "devDependencies": {
     "@types/node": "^22.15.3",
     "prisma": "^6.8.2",
     "ts-node": "^10.9.2"
   },
   "dependencies": {
-    "@prisma/client": "^6.8.2",
+    "@prisma/client": "^6.9.0",
     "@prisma/extension-accelerate": "^2.0.1",
     "@types/bcryptjs": "^2.4.6",
     "bcryptjs": "^3.0.2",
