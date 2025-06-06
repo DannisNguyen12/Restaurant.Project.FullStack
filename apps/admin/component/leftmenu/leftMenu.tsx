@@ -63,6 +63,7 @@ export default function StaticSidebar({ onCategorySelect, selectedCategoryId }: 
           <ul className="px-2 space-y-1">
             <li>
               <button
+                data-testid="category-all-items"
                 onClick={() => onCategorySelect?.(0)}
                 className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${
                   selectedCategoryId === 0 
@@ -97,6 +98,7 @@ export default function StaticSidebar({ onCategorySelect, selectedCategoryId }: 
             {categories.map((category) => (
               <li key={category.id}>
                 <button
+                  data-testid={`category-${category.name.toLowerCase().replace(/\s+/g, '-')}`}
                   onClick={() => onCategorySelect?.(category.id)}
                   className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${
                     selectedCategoryId === category.id 
@@ -124,6 +126,7 @@ export default function StaticSidebar({ onCategorySelect, selectedCategoryId }: 
       {/* Create Item */}
       <div className="p-4 border-t border-gray-700">
           <button 
+            data-testid="create-item-button"
             type="button" 
             onClick={() => router.push('/item/create')}
             className="w-full py-2 px-4 text-sm bg-green-600 hover:bg-green-700 rounded-lg transition-colors flex items-center justify-center"

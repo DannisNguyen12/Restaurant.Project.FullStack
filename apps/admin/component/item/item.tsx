@@ -73,6 +73,7 @@ export default function Item({
 
   return (
     <div 
+      data-testid={`item-card-${id}`}
       className="bg-white rounded-xl overflow-hidden shadow-md transition-all duration-300 hover:shadow-xl border border-gray-100 h-full flex flex-col group"
     >
       {/* Image */}
