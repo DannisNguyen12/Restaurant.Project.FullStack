@@ -2,19 +2,25 @@
   "$schema": "https://turborepo.com/schema.json",
   "ui": "tui",
   "globalEnv": [
-    "NODE_ENV", 
+    "NODE_ENV",
     "JWT_SECRET",
     "GITHUB_CLIENT_ID",
-    "GITHUB_CLIENT_SECRET", 
+    "GITHUB_CLIENT_SECRET",
     "GOOGLE_CLIENT_ID",
     "GOOGLE_CLIENT_SECRET",
-    "NEXTAUTH_SECRET"
+    "NEXTAUTH_SECRET",
+    "NEXTAUTH_URL",
+    "DATABASE_URL",
+    "BCRYPT_COST_FACTOR"
   ],
   "tasks": {
+    "db:generate": {
+      "cache": false
+    },
     "build": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "dependsOn": ["^build", "db:generate"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*", "prisma/**"],
+      "outputs": [".next/**", "!.next/cache/**", "generated/**"]
     },
     "lint": {
       "dependsOn": ["^lint"]

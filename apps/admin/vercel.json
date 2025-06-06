@@ -1,0 +1,7 @@
+{
+  "version": 2,
+  "buildCommand": "cd ../.. && pnpm db:generate && pnpm --filter admin build",
+  "outputDirectory": ".next",
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD ./",
+  "installCommand": "cd ../.. && pnpm install"
+}

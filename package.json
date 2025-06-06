@@ -8,7 +8,13 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
     "prepare": "husky",
-    "release": "turbo run build && changeset publish"
+    "release": "turbo run build && changeset publish",
+    "db:generate": "pnpm --filter database db:generate",
+    "db:push": "pnpm --filter database db:push",
+    "db:seed": "pnpm --filter database db:seed",
+    "db:studio": "pnpm --filter database db:studio",
+    "vercel-build": "pnpm db:generate && turbo run build",
+    "vercel-check": "./scripts/vercel-check.sh"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.4",

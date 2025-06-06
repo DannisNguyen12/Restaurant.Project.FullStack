@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "buildCommand": "pnpm db:generate && pnpm build",
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD .",
+  "installCommand": "pnpm install",
+  "github": {
+    "silent": true,
+    "autoJobCancelation": true
+  },
+  "git": {
+    "deploymentEnabled": {
+      "main": true,
+      "dev": true,
+      "staging": true
+    }
+  },
+  "env": {
+    "NEXT_PUBLIC_VERCEL_ENV": "production"
+  },
+  "rewrites": [
+    {
+      "source": "/admin/:path*",
+      "destination": "https://admin-restaurant-project.vercel.app/:path*"
+    },
+    {
+      "source": "/((?!admin/).*)",
+      "destination": "https://customer-restaurant-project.vercel.app/:path*"
+    }
+  ]
+}

@@ -272,6 +272,26 @@ For deployment to different environments:
 
 You can monitor CI/CD runs in the "Actions" tab of the GitHub repository.
 
+## 🚀 Vercel Deployment
+
+This project is optimized for deployment on Vercel. For detailed deployment instructions, see [Vercel Deployment Guide](./docs/vercel-deployment.md).
+
+### Quick Deployment Steps
+
+1. Connect your GitHub repository to Vercel
+2. Configure environment variables:
+   - `DATABASE_URL`: Your PostgreSQL connection string
+   - `NEXTAUTH_SECRET`: A secure secret for NextAuth
+   - `NEXTAUTH_URL`: Your Vercel application URL
+   - `BCRYPT_COST_FACTOR`: Recommended value is 10
+3. Deploy
+
+The repository includes Vercel configuration files that will automatically:
+
+- Generate the Prisma client during build
+- Build both admin and customer applications
+- Set up proper routing and configurations
+
 ## 🏗️ Project Structure
 
 ```
