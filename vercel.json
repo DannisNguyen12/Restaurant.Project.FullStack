@@ -1,6 +1,4 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "version": 2,
-  "framework": "turborepo",
-  "buildCommand": "turbo build"
+  "version": 2
 }
