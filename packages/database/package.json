@@ -6,7 +6,6 @@
     "db:push": "npx prisma db push",
     "db:seed": "npx ts-node src/seed.ts",
     "db:studio": "npx prisma studio",
-    "postinstall": "npx prisma generate",
     "build": "npx prisma generate"
   },
   "devDependencies": {

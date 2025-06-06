@@ -1,6 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
-  "buildCommand": "cd ../.. && turbo build --filter=admin",
-  "outputDirectory": ".next"
+  "buildCommand": "chmod +x ../../scripts/vercel-build-admin.sh && ../../scripts/vercel-build-admin.sh",
+  "outputDirectory": ".next",
+  "installCommand": "echo 'Custom install handled in build script'"
 }
