@@ -1,6 +1,9 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 import Image from 'next/image';
+import { useCart } from '../../context/CartContext';
+import { useToast } from '../../context/ToastContext';
 
 // Item data structure based on your Prisma model
 type Item = {
@@ -37,6 +40,22 @@ export default function ItemDetail({ itemId }: ItemDetailProps) {
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState('description');
   
+  // Cart and like functionality
+  const { data: session } = useSession();
+  const { addToCart } = useCart();
+  const { addToast } = useToast();
+  
+  // Like state
+  const [likeData, setLikeData] = useState<{
+    userLike: 'LIKE' | null;
+    counts: { likes: number; total: number };
+  }>({
+    userLike: null,
+    counts: { likes: 0, total: 0 }
+  });
+  const [likeLoading, setLikeLoading] = useState(false);
+  const [cartLoading, setCartLoading] = useState(false);
+  
   // Fetch item data from API
   useEffect(() => {
     const fetchItemDetails = async () => {
@@ -67,6 +86,127 @@ export default function ItemDetail({ itemId }: ItemDetailProps) {
       fetchItemDetails();
     }
   }, [itemId]);
+
+  // Fetch like data
+  useEffect(() => {
+    const fetchLikeData = async () => {
+      try {
+        const response = await fetch(`/api/items/${itemId}/like`);
+        if (response.ok) {
+          const data = await response.json();
+          setLikeData(data);
+        }
+      } catch (error) {
+        console.error('Error fetching like data:', error);
+      }
+    };
+
+    if (itemId) {
+      fetchLikeData();
+    }
+  }, [itemId]);
+
+  // Handle add to cart
+  const handleAddToCart = async () => {
+    if (!item) return;
+    
+    setCartLoading(true);
+    try {
+      addToCart({
+        id: item.id,
+        name: item.name,
+        description: item.fullDescription || '',
+        price: item.price,
+        image: item.image || ''
+      }, quantity);
+      
+      addToast({
+        type: 'success',
+        title: 'Added to cart!',
+        message: `${quantity} x ${item.name} added to your cart`
+      });
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      addToast({
+        type: 'error',
+        title: 'Error',
+        message: 'Failed to add item to cart'
+      });
+    } finally {
+      setCartLoading(false);
+    }
+  };
+
+  // Handle like/unlike
+  const handleLike = async () => {
+    if (!session?.user) {
+      addToast({
+        type: 'warning',
+        title: 'Sign in required',
+        message: 'Please sign in to like items'
+      });
+      return;
+    }
+
+    setLikeLoading(true);
+    try {
+      // If user already liked, remove it (toggle)
+      if (likeData.userLike === 'LIKE') {
+        const response = await fetch(`/api/items/${itemId}/like`, {
+          method: 'DELETE',
+        });
+
+        if (response.ok) {
+          setLikeData(prev => ({
+            userLike: null,
+            counts: {
+              likes: Math.max(0, prev.counts.likes - 1),
+              total: Math.max(0, prev.counts.total - 1)
+            }
+          }));
+          addToast({
+            type: 'info',
+            title: 'Like removed',
+            message: 'Your like has been removed'
+          });
+        }
+      } else {
+        // Add like
+        const response = await fetch(`/api/items/${itemId}/like`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ type: 'LIKE' }),
+        });
+
+        if (response.ok) {
+          setLikeData(prev => ({
+            userLike: 'LIKE',
+            counts: {
+              likes: prev.counts.likes + 1,
+              total: prev.counts.total + 1
+            }
+          }));
+          
+          addToast({
+            type: 'success',
+            title: 'Liked!',
+            message: 'You liked this item'
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error liking item:', error);
+      addToast({
+        type: 'error',
+        title: 'Error',
+        message: 'Failed to like item'
+      });
+    } finally {
+      setLikeLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -248,11 +388,13 @@ export default function ItemDetail({ itemId }: ItemDetailProps) {
             {/* Stats and Actions */}
             <div className="mt-8 pt-6 border-t border-gray-200">
               <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center">
-                  <svg className="h-5 w-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                  </svg>
-                  <span className="text-gray-600">{item?.likes?.length ?? 0} likes</span>
+                <div className="flex items-center space-x-6">
+                  <div className="flex items-center">
+                    <svg className="h-5 w-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                    <span className="text-gray-600">{likeData.counts.likes} likes</span>
+                  </div>
                 </div>
                 <div className="flex items-center">
                   <svg className="h-5 w-5 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -284,11 +426,23 @@ export default function ItemDetail({ itemId }: ItemDetailProps) {
 
               {/* Action Buttons */}
               <div className="flex space-x-4">
-                <button className="flex-1 py-3 px-4 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
-                  Add to Cart
+                <button 
+                  onClick={handleAddToCart}
+                  disabled={cartLoading || !item}
+                  className="flex-1 py-3 px-4 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {cartLoading ? 'Adding...' : 'Add to Cart'}
                 </button>
-                <button className="py-3 px-4 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors">
-                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <button 
+                  onClick={handleLike}
+                  disabled={likeLoading}
+                  className={`py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                    likeData.userLike === 'LIKE' 
+                      ? 'bg-red-500 text-white hover:bg-red-600 focus:ring-red-500' 
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300 focus:ring-gray-500'
+                  }`}
+                >
+                  <svg className="h-5 w-5" fill={likeData.userLike === 'LIKE' ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                   </svg>
                 </button>
