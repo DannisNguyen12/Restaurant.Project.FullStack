@@ -1,0 +1,20 @@
+# These owners will be the default owners for everything in the repo
+# Unless a later match takes precedence, these owners will be requested for
+# review when someone opens a pull request.
+* @ Manh Long Nguyen
+
+# Apps ownership
+/apps/admin/ @Manh Long Nguyen
+/apps/customer/ @Manh Long Nguyen
+
+# Database ownership
+/packages/database/ @Manh Long Nguyen
+
+# Testing ownership
+/packages/test/ @Manh Long Nguyen
+
+# Config ownership
+*.json @Manh Long Nguyen
+*.yaml @Manh Long Nguyen
+*.yml @Manh Long Nguyen
+.github/ @Manh Long Nguyen

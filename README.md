@@ -22,9 +22,11 @@ Restaurant.Project.FullStack/
 ## 🚀 Applications
 
 ### 🔧 Admin Application (Port 3002)
+
 The restaurant management interface for staff and administrators.
 
 **Key Features:**
+
 - **Menu Management**: Add, edit, delete menu items with rich details
 - **Category Organization**: Organize menu items by categories
 - **Advanced Search**: Filter items by name, category, and availability
@@ -34,9 +36,11 @@ The restaurant management interface for staff and administrators.
 [📖 View Admin Documentation](./apps/admin/README.md)
 
 ### 🛒 Customer Application (Port 3001)
+
 The customer-facing ordering interface for restaurant patrons.
 
 **Key Features:**
+
 - **Menu Browsing**: Intuitive menu exploration with categories
 - **Shopping Cart**: Advanced cart management with React Context
 - **User Authentication**: Secure customer accounts with NextAuth.js
@@ -48,6 +52,7 @@ The customer-facing ordering interface for restaurant patrons.
 ## 🛠️ Technology Stack
 
 ### Frontend
+
 - **Framework**: Next.js 15.3.0 with App Router
 - **UI Library**: React 19.1.0
 - **Styling**: Tailwind CSS 4.1.7
@@ -55,17 +60,19 @@ The customer-facing ordering interface for restaurant patrons.
 - **Build Tool**: Turbopack for fast development
 
 ### Backend & Database
+
 - **Database**: PostgreSQL
 - **ORM**: Prisma for type-safe database operations
 - **Authentication**: NextAuth.js with multiple providers
 - **Password Security**: bcryptjs for secure password hashing
 
 ### Development & Deployment
+
 - **Monorepo Management**: Turborepo 2.5.3
 - **Package Manager**: pnpm 9.0.0
 - **Testing**: Playwright for E2E testing
 - **CI/CD**: GitHub Actions with comprehensive workflows
-- **Code Quality**: ESLint, Prettier, TypeScript strict mode
+- **Code Quality**: ESLint, Prettier, TypeScript strict mode, Husky for Git hooks
 
 ## 📊 Database Schema
 
@@ -89,17 +96,20 @@ The shared database includes the following main entities:
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone <repository-url>
    cd Restaurant.Project.FullStack
    ```
 
 2. **Install dependencies**
+
    ```bash
    pnpm install
    ```
 
 3. **Set up environment variables**
+
    ```bash
    # Copy environment templates
    cp apps/admin/.env.example apps/admin/.env.local
@@ -108,14 +118,15 @@ The shared database includes the following main entities:
    ```
 
 4. **Configure your environment variables**
+
    ```bash
    # Database
    DATABASE_URL="postgresql://username:password@localhost:5432/restaurant_db"
-   
+
    # Authentication
    NEXTAUTH_SECRET="your-nextauth-secret"
    NEXTAUTH_URL="http://localhost:3001"  # For customer app
-   
+
    # OAuth providers (optional)
    GITHUB_CLIENT_ID="your-github-client-id"
    GITHUB_CLIENT_SECRET="your-github-client-secret"
@@ -124,6 +135,7 @@ The shared database includes the following main entities:
    ```
 
 5. **Set up the database**
+
    ```bash
    cd packages/database
    pnpm db:migrate
@@ -131,12 +143,14 @@ The shared database includes the following main entities:
    ```
 
 6. **Start the development servers**
+
    ```bash
    # From the root directory
    pnpm dev
    ```
 
    This will start:
+
    - **Customer App**: http://localhost:3001
    - **Admin App**: http://localhost:3002
 
@@ -202,6 +216,7 @@ pnpm test:e2e:ui
 ```
 
 **Test Coverage:**
+
 - User authentication flows
 - Menu browsing and search
 - Shopping cart operations
@@ -211,23 +226,51 @@ pnpm test:e2e:ui
 
 [📖 View Testing Documentation](./packages/test/README.md)
 
-## 🚦 CI/CD
+## 🔄 CI/CD Pipeline
 
-The project includes robust CI/CD pipelines with GitHub Actions:
+This project uses GitHub Actions for Continuous Integration and Continuous Deployment.
 
-### Workflows
-- **Main CI/CD Pipeline**: Automated testing, building, and deployment
-- **Database Migration**: Safe database schema updates
-- **Security Scanning**: Dependency vulnerability checks
-- **Code Quality**: Automated linting and type checking
+### CI Workflow
 
-### Deployment Strategies
-- **Staging Environment**: Automatic deployment for testing
-- **Production Environment**: Manual approval required
-- **Blue-Green Deployment**: Zero-downtime deployments
-- **Database Migrations**: Automated with rollback capabilities
+The CI workflow runs automatically on these events:
 
-[📖 View CI/CD Documentation](./docs/CICD.md)
+- Push to `main`, `master`, or `dev` branches
+- Pull requests to `main`, `master`, or `dev` branches
+
+The CI pipeline includes:
+
+1. **Dependencies Installation**: Installs and caches all dependencies
+2. **Linting**: Checks code quality and style
+3. **Building**: Compiles and builds all applications
+4. **Testing**: Runs E2E tests against built applications
+5. **Deployment**: Automatically deploys to production (for `main`/`master` branches only)
+
+### Local Development Hooks
+
+For local development, we use Git hooks to ensure code quality:
+
+- **Pre-commit**: Runs ESLint and Prettier on staged files
+
+### Setting up Secrets
+
+To use the CI/CD pipeline, you need to set up these GitHub secrets:
+
+```
+DATABASE_URL=your_database_connection_string
+NEXTAUTH_SECRET=your_nextauth_secret
+NEXTAUTH_URL=your_app_url
+```
+
+### Deployment Configuration
+
+For deployment to different environments:
+
+- `main`/`master` branch → Production
+- `dev` branch → Staging/QA
+
+### Monitoring CI/CD
+
+You can monitor CI/CD runs in the "Actions" tab of the GitHub repository.
 
 ## 🏗️ Project Structure
 
@@ -275,12 +318,14 @@ The project includes robust CI/CD pipelines with GitHub Actions:
 ## 🌐 Environment Configuration
 
 ### Development Environment
+
 - **Hot Reload**: Enabled for all applications
 - **Source Maps**: Available for debugging
 - **Type Checking**: Real-time TypeScript validation
 - **Database**: Local PostgreSQL instance
 
 ### Production Environment
+
 - **Optimized Builds**: Minified and tree-shaken bundles
 - **Caching**: Static asset caching with CDN
 - **Monitoring**: Application performance monitoring
@@ -310,6 +355,7 @@ The project includes robust CI/CD pipelines with GitHub Actions:
 ### Common Issues
 
 **Database Connection Issues**
+
 ```bash
 # Check database connection
 cd packages/database
@@ -317,6 +363,7 @@ pnpm db:studio
 ```
 
 **Port Conflicts**
+
 ```bash
 # Check if ports are in use
 lsof -i :3001  # Customer app
@@ -324,6 +371,7 @@ lsof -i :3002  # Admin app
 ```
 
 **Dependencies Issues**
+
 ```bash
 # Clean and reinstall
 rm -rf node_modules
@@ -332,6 +380,7 @@ pnpm install
 ```
 
 **Build Issues**
+
 ```bash
 # Clean Turbo cache
 pnpm turbo clean
@@ -353,6 +402,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🙋‍♂️ Support
 
 For support, please:
+
 1. Check the [documentation](./docs/)
 2. Search existing [issues](../../issues)
 3. Create a new issue with detailed information
