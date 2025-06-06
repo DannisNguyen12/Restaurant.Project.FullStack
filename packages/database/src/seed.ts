@@ -8,16 +8,14 @@ const prisma = new PrismaClient()
 export async function main() {
    // Clear existing data in reverse order of dependencies
   console.log('🗑️ Clearing existing data...');
-  await prisma.like.deleteMany({});
-  console.log('Deleted all likes.');
-  await prisma.item.deleteMany({});
-  console.log('Deleted all items.');
-  await prisma.user.deleteMany({});
-  console.log('Deleted all users.');
-  await prisma.category.deleteMany({});
-  console.log('Deleted all categories.');
+  await prisma.orderItem.deleteMany({}); 
+  await prisma.order.deleteMany({});
+  await prisma.like.deleteMany({});     
+  await prisma.item.deleteMany({});      
+  await prisma.user.deleteMany({});    
+  await prisma.category.deleteMany({});   
+
   console.log('✅ All existing data cleared.');
-  console.log('🌱 Starting database seeding...');
 
   console.log('🌱 Starting database seeding...');
 
@@ -40,7 +38,6 @@ export async function main() {
     create: { name: 'Dessert' },
   });
 
-  console.log(`✅ Created categories: ${appetizer.name}, ${mainCourse.name}, ${dessert.name}`);
 
   // Seed items
   const phoBo = await prisma.item.create({
@@ -107,10 +104,6 @@ export async function main() {
     },
   });
 
-  console.log(
-    `✅ Created items: ${phoBo.name}, ${banhMi.name}, ${springRolls.name}, ${tiramisu.name}`
-  );
-
   // Seed users
   const hashedPassword1 = await encryptPassword('123');
   const hashedPassword2 = await encryptPassword('123');
@@ -150,8 +143,6 @@ export async function main() {
     },
   });
 
-  console.log(`✅ Created users: ${user1.name}, ${user2.name}, ${adminUser.name} (Admin)`);
-
   // Seed likes
   await prisma.like.createMany({
     data: [
@@ -161,8 +152,8 @@ export async function main() {
       { userId: user2.id, itemId: tiramisu.id, type: 'LIKE' },
     ],
   });
-
-  console.log('✅ Created likes');
+  
+  console.log('✅ Database seeding completed successfully.');
 }
 
 main()
