@@ -1,7 +1,8 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
-  "buildCommand": "cd ../.. && pnpm db:generate && pnpm --filter customer build",
+  "buildCommand": "cd ../.. && pnpm db:generate && cd apps/customer && pnpm build",
   "outputDirectory": ".next",
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD ./",
-  "installCommand": "cd ../.. && pnpm install"
+  "installCommand": "cd ../.. && pnpm install",
+  "ignoreCommand": "echo 'Skipping Git checks'"
 }
