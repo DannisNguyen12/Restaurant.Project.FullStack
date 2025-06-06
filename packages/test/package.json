@@ -1,0 +1,27 @@
+{
+  "name": "test",
+  "version": "1.0.0",
+  "description": "E2E testing for Restaurant Project using Playwright",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:admin": "playwright test --project=admin",
+    "test:customer": "playwright test --project=customer",
+    "test:ui": "playwright test --ui",
+    "test:report": "playwright show-report",
+    "install:browsers": "playwright install"
+  },
+  "keywords": ["testing", "playwright", "e2e", "restaurant"],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.52.0",
+    "@types/node": "^22.15.30",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "database": "workspace:*"
+  }
+}

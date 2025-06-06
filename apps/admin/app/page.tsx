@@ -1,102 +1,188 @@
-import Image, { type ImageProps } from "next/image";
-import { Button } from "@repo/ui/button";
-import styles from "./page.module.css";
+'use client';
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { useSession, signOut } from 'next-auth/react';
+import StaticSidebar from '../component/leftmenu/leftMenu';
+import TopSearchBar from '../component/search/search';
+import HomeContent from '../component/home/homeContent';
 
-type Props = Omit<ImageProps, "src"> & {
-  srcLight: string;
-  srcDark: string;
-};
+// Import SearchItem interface from the component that defines it
+import { SearchItem } from '../component/search/search';
 
-const ThemeImage = (props: Props) => {
-  const { srcLight, srcDark, ...rest } = props;
+export default function HomePage() {
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(0); // 0 means all items
+  const [searchResults, setSearchResults] = useState<SearchItem[] | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const { data: session, status } = useSession();
+  const user = session?.user;
+  const isAuthenticated = status === 'authenticated';
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  // Close user menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setIsUserMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Memoize these callbacks to prevent recreating them on every render
+  const handleCategorySelect = useCallback((categoryId: number) => {
+    setSelectedCategoryId(categoryId);
+    setSearchResults(null);
+    setSearchQuery(null);
+    setIsMobileMenuOpen(false); // Close mobile menu when category is selected
+  }, []);
+
+  const handleSearch = useCallback((query: string) => {
+    setSearchQuery(query);
+    // Category selection will be cleared by the searchResults being set
+  }, []);
+
+  const handleItemsFound = useCallback((items: SearchItem[]) => {
+    setSearchResults(items);
+    // This will override category selection in the HomeContent component
+  }, []);
 
   return (
-    <>
-      <Image {...rest} src={srcLight} className="imgLight" />
-      <Image {...rest} src={srcDark} className="imgDark" />
-    </>
-  );
-};
-
-export default function Home() {
-  return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <ThemeImage
-          className={styles.logo}
-          srcLight="turborepo-dark.svg"
-          srcDark="turborepo-light.svg"
-          alt="Turborepo logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>apps/web/app/page.tsx</code>
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new/clone?demo-description=Learn+to+implement+a+monorepo+with+a+two+Next.js+sites+that+has+installed+three+local+packages.&demo-image=%2F%2Fimages.ctfassets.net%2Fe5382hct74si%2F4K8ZISWAzJ8X1504ca0zmC%2F0b21a1c6246add355e55816278ef54bc%2FBasic.png&demo-title=Monorepo+with+Turborepo&demo-url=https%3A%2F%2Fexamples-basic-web.vercel.sh%2F&from=templates&project-name=Monorepo+with+Turborepo&repository-name=monorepo-turborepo&repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fturborepo%2Ftree%2Fmain%2Fexamples%2Fbasic&root-directory=apps%2Fdocs&skippable-integrations=1&teamSlug=vercel&utm_source=create-turbo"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://turborepo.com/docs?utm_source"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
+    <div className="flex flex-col lg:flex-row h-screen overflow-hidden bg-gray-100">
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden fixed inset-0 z-50 flex">
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+          {/* Menu Panel */}
+          <div className="relative bg-white w-80 max-w-sm shadow-xl">
+            <div className="flex items-center justify-between p-4 border-b">
+              <h2 className="text-lg font-semibold text-gray-800">Categories</h2>
+              <button
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="overflow-y-auto">
+              <StaticSidebar 
+                onCategorySelect={handleCategorySelect} 
+                selectedCategoryId={selectedCategoryId}
+              />
+            </div>
+          </div>
         </div>
-        <Button appName="web" className={styles.secondary}>
-          Open alert
-        </Button>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com/templates?search=turborepo&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+      )}
+
+      {/* Left Menu - Hidden on mobile, overlay on tablet, sidebar on desktop */}
+      <div className="hidden lg:block lg:w-64 flex-shrink-0">
+        <StaticSidebar 
+          onCategorySelect={handleCategorySelect} 
+          selectedCategoryId={selectedCategoryId}
+        />
+      </div>
+      
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Header with Search Bar and User Menu */}
+        <div className="flex items-center justify-between gap-4 p-2 sm:p-4 lg:p-6 bg-white shadow-sm border-b">
+          <div className="flex-1">
+            <TopSearchBar 
+              onSearch={handleSearch}
+              onItemsFound={handleItemsFound}
+            />
+          </div>
+          
+          {/* User Menu */}
+          {isAuthenticated ? (
+            <div className="relative" ref={userMenuRef}>
+              <button
+                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center">
+                  <span className="text-white text-sm font-semibold">
+                    {user?.email?.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+                <span className="hidden sm:block text-sm font-medium text-gray-700">
+                  {user?.email}
+                </span>
+                <svg 
+                  className="w-4 h-4 text-gray-500" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              
+              {isUserMenuOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border z-50">
+                  <div className="py-1">
+                    <div className="px-4 py-2 text-sm text-gray-500 border-b">
+                      Signed in as {user?.email}
+                    </div>
+                    <button
+                      onClick={async () => {
+                        await signOut();
+                        setIsUserMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="flex items-center space-x-2">
+              <a
+                href="/signin"
+                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors"
+              >
+                Sign In
+              </a>
+            </div>
+          )}
+        </div>
+        
+        {/* Content Area with Cart */}
+        <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+          {/* Main Content */}
+          <main className="flex-1 overflow-y-auto p-2 sm:p-4 lg:p-6">
+            <HomeContent 
+              categoryId={selectedCategoryId} 
+              searchResults={searchResults}
+              searchQuery={searchQuery}
+            />
+          </main>
+          
+        </div>
+      </div>
+
+      {/* Mobile Menu Button - Show on mobile/tablet */}
+      <div className="lg:hidden fixed bottom-4 left-4 z-40">
+        <button 
+          className="bg-indigo-600 text-white p-3 rounded-full shadow-lg hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          onClick={() => setIsMobileMenuOpen(true)}
+          aria-label="Open menu"
         >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://turborepo.com?utm_source=create-turbo"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to turborepo.com →
-        </a>
-      </footer>
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
     </div>
   );
 }

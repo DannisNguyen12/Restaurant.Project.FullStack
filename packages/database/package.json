@@ -1,21 +1,16 @@
 {
   "name": "database",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "seed": "tsx src/seed.ts"
+  "version": "0.0.0",
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "prisma": "^6.8.2",
+    "ts-node": "^10.9.2"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "@prisma/client": "^6.8.2",
-    "prisma": "^6.8.2"
-  },
-  "devDependencies": {
-    "ts-node": "^10.9.2",
-    "tsx": "^4.19.4",
-    "typescript": "^5.8.3"
+    "@prisma/extension-accelerate": "^2.0.1",
+    "@types/bcryptjs": "^2.4.6",
+    "bcryptjs": "^3.0.2",
+    "dotenv": "^16.5.0"
   }
 }

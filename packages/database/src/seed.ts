@@ -1,10 +1,22 @@
 // prisma/seed.ts
 
 import { PrismaClient } from '../generated/prisma'
+import { encryptPassword } from './encrypt';
 
 const prisma = new PrismaClient()
 
-async function main() {
+export async function main() {
+   // Clear existing data in reverse order of dependencies
+  console.log('🗑️ Clearing existing data...');
+  await prisma.orderItem.deleteMany({}); 
+  await prisma.order.deleteMany({});
+  await prisma.like.deleteMany({});     
+  await prisma.item.deleteMany({});      
+  await prisma.user.deleteMany({});    
+  await prisma.category.deleteMany({});   
+
+  console.log('✅ All existing data cleared.');
+
   console.log('🌱 Starting database seeding...');
 
   // Seed categories
@@ -26,7 +38,6 @@ async function main() {
     create: { name: 'Dessert' },
   });
 
-  console.log(`✅ Created categories: ${appetizer.name}, ${mainCourse.name}, ${dessert.name}`);
 
   // Seed items
   const phoBo = await prisma.item.create({
@@ -36,7 +47,7 @@ async function main() {
       fullDescription:
         'Pho bo is one of Vietnam’s most iconic dishes. Made with slow-cooked beef bones, aromatic spices, and fresh rice noodles, it delivers deep umami flavor in every spoonful.',
       price: 12.99,
-      image: 'https://placehold.co/600x400?text=Pho+Bo ',
+      image: 'https://restaurantwebsiteproject.s3.ap-southeast-2.amazonaws.com/e7ddae1f-399d-490a-acff-847131fd5cec.png',
       ingredients: ['Beef bones', 'Rice noodles', 'Star anise', 'Cloves', 'Ginger', 'Onion', 'Fish sauce'],
       servingTips: [
         'Stir well before eating to mix flavors.',
@@ -55,7 +66,7 @@ async function main() {
       fullDescription:
         'Banh Mi is a classic Vietnamese sandwich made with a crispy baguette, pickled veggies, herbs, and your choice of protein.',
       price: 8.99,
-      image: 'https://placehold.co/600x400?text=Banh+Mi ',
+      image: 'https://restaurantwebsiteproject.s3.ap-southeast-2.amazonaws.com/2c4e7cb9-99d6-4d76-bc45-7bffda155548.png',
       ingredients: ['Baguette', 'Pâté', 'Pickled carrots', 'Cucumber', 'Chili sauce'],
       servingTips: ['Eat while warm for best texture.', 'Pair with a cold drink.'],
       recommendations: ['Fruit smoothie', 'Iced coffee'],
@@ -70,7 +81,7 @@ async function main() {
       fullDescription:
         'These fresh Vietnamese spring rolls are filled with shrimp, vermicelli noodles, mint, lettuce, and other fresh veggies — light and healthy!',
       price: 6.99,
-      image: 'https://placehold.co/600x400?text=Spring+Rolls ',
+      image: 'https://restaurantwebsiteproject.s3.ap-southeast-2.amazonaws.com/1c68945f-3f4f-4a66-8c2a-b369f3e6ee56.png',
       ingredients: ['Shrimp', 'Vermicelli noodles', 'Lettuce', 'Mint', 'Carrots', 'Rice paper'],
       servingTips: ['Dip in peanut or hoisin sauce.', 'Eat within 30 minutes of preparation.'],
       recommendations: ['Tofu soup', 'Green tea'],
@@ -85,7 +96,7 @@ async function main() {
       fullDescription:
         'A rich, creamy, and indulgent dessert made with mascarpone cheese, cocoa powder, and strong brewed coffee.',
       price: 7.99,
-      image: 'https://placehold.co/600x400?text=Tiramisu ',
+      image: 'https://restaurantwebsiteproject.s3.ap-southeast-2.amazonaws.com/3db71eff-9e40-4cb8-8d62-cddeff73d7e8.png',
       ingredients: ['Ladyfingers', 'Espresso', 'Mascarpone', 'Eggs', 'Sugar', 'Cocoa powder'],
       servingTips: ['Best served chilled.', 'Let sit for 5 mins after refrigeration.'],
       recommendations: ['Coffee', 'Sweet wine'],
@@ -93,18 +104,18 @@ async function main() {
     },
   });
 
-  console.log(
-    `✅ Created items: ${phoBo.name}, ${banhMi.name}, ${springRolls.name}, ${tiramisu.name}`
-  );
-
   // Seed users
+  const hashedPassword1 = await encryptPassword('123');
+  const hashedPassword2 = await encryptPassword('123');
+  const hashedPasswordAdmin = await encryptPassword('123');
+  
   const user1 = await prisma.user.upsert({
     where: { email: 'alice@example.com' },
     update: {},
     create: {
       email: 'alice@example.com',
       name: 'Alice Nguyen',
-      password: '123',
+      password: hashedPassword1,
     },
   });
 
@@ -114,11 +125,23 @@ async function main() {
     create: {
       email: 'bob@example.com',
       name: 'Bob Johnson',
-      password: '123',
+      password: hashedPassword2,
     },
   });
-
-  console.log(`✅ Created users: ${user1.name}, ${user2.name}`);
+  
+  // Create admin user
+  const adminUser = await prisma.user.upsert({
+    where: { email: 'admin@example.com' },
+    update: {
+      role: 'ADMIN', // Ensure role is updated even if user exists
+    },
+    create: {
+      email: 'admin@example.com',
+      name: 'Admin User',
+      password: hashedPasswordAdmin,
+      role: 'ADMIN',
+    },
+  });
 
   // Seed likes
   await prisma.like.createMany({
@@ -129,15 +152,15 @@ async function main() {
       { userId: user2.id, itemId: tiramisu.id, type: 'LIKE' },
     ],
   });
-
-  console.log('✅ Created likes');
+  
+  console.log('✅ Database seeding completed successfully.');
 }
 
 main()
   .catch((e) => {
     console.error('❌ Seeding failed:', e);
-    process.exit(1);
+    //process.exit(1);
   })
   .finally(async () => {
     await prisma.$disconnect();
-  }); 
+  });

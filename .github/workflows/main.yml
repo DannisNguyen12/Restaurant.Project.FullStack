@@ -1,0 +1,123 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Create Release PR or Publish to npm
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          # This expects you to have a script called release which does a build for your packages
+          publish: pnpm release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # If you plan to publish to npm, uncomment the line below and add the NPM_TOKEN secret to your repository
+          # NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create GitHub Release
+        if: steps.changesets.outputs.hasChangesets == 'false'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { data: releases } = await github.rest.repos.listReleases({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 1
+            });
+            
+            if (releases.length === 0) {
+              console.log('No releases found');
+              return;
+            }
+            
+            const latestRelease = releases[0];
+            console.log(`Latest release: ${latestRelease.tag_name}`);
+            
+            // Get commits since last release
+            const { data: commits } = await github.rest.repos.listCommits({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100,
+              since: latestRelease.created_at
+            });
+            
+            // Generate changelog
+            let changelog = '## What\'s Changed\n\n';
+            
+            for (const commit of commits) {
+              // Skip merge commits
+              if (commit.commit.message.startsWith('Merge')) continue;
+              
+              const shortSha = commit.sha.substring(0, 7);
+              let message = commit.commit.message.split('\n')[0]; // Get first line
+              
+              // Format using conventional commits if possible
+              if (message.match(/^(feat|fix|docs|style|refactor|perf|test|chore)(\(.+\))?:/)) {
+                const type = message.split(':')[0];
+                const rest = message.split(':').slice(1).join(':').trim();
+                
+                if (type.startsWith('feat')) {
+                  message = `✨ ${rest}`;
+                } else if (type.startsWith('fix')) {
+                  message = `🐛 ${rest}`;
+                } else if (type.startsWith('docs')) {
+                  message = `📚 ${rest}`;
+                } else if (type.startsWith('style')) {
+                  message = `💎 ${rest}`;
+                } else if (type.startsWith('refactor')) {
+                  message = `♻️ ${rest}`;
+                } else if (type.startsWith('perf')) {
+                  message = `⚡️ ${rest}`;
+                } else if (type.startsWith('test')) {
+                  message = `✅ ${rest}`;
+                } else if (type.startsWith('chore')) {
+                  message = `🔧 ${rest}`;
+                }
+              }
+              
+              changelog += `* ${message} ([${shortSha}](${commit.html_url}))\n`;
+            }
+            
+            // Create new release
+            const version = 'v' + require('./package.json').version;
+            
+            github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: version,
+              name: version,
+              body: changelog,
+              draft: false,
+              prerelease: false
+            });
