@@ -21,7 +21,7 @@ export async function POST(
 
     const { type } = await request.json();
     
-    if (!type || !['LIKE', 'DISLIKE'].includes(type)) {
+    if (!type || type !== 'LIKE') {
       return NextResponse.json({ error: 'Invalid like type' }, { status: 400 });
     }
 
@@ -137,14 +137,12 @@ export async function GET(
     });
 
     const likes = likeCounts.find(count => count.type === 'LIKE')?._count.type || 0;
-    const dislikes = likeCounts.find(count => count.type === 'DISLIKE')?._count.type || 0;
 
     return NextResponse.json({
       userLike: userLike ? userLike.type : null,
       counts: {
         likes,
-        dislikes,
-        total: likes + dislikes
+        total: likes
       }
     });
 
