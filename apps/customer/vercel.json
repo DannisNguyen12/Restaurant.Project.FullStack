@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
-  "buildCommand": "cd ../.. && pnpm install && pnpm db:generate && cd apps/customer && pnpm build",
+  "buildCommand": "cd ../.. && pnpm install && pnpm db:generate && cd apps/customer && turbo build",
   "outputDirectory": ".next",
   "env": {
     "SKIP_BUILD_STATIC_GENERATION": "true"

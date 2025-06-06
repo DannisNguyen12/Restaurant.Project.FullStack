@@ -7,14 +7,13 @@ settings:
 importers:
 
   .:
-    dependencies:
-      '@tailwindcss/postcss':
-        specifier: ^4.1.7
-        version: 4.1.7
     devDependencies:
       '@changesets/cli':
         specifier: ^2.29.4
         version: 2.29.4
+      '@tailwindcss/postcss':
+        specifier: ^4.1.7
+        version: 4.1.7
       autoprefixer:
         specifier: ^10.4.21
         version: 10.4.21(postcss@8.5.3)
