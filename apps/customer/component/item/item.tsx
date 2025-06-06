@@ -67,6 +67,7 @@ export default function Item({
   return (
     <div 
       className="bg-white rounded-xl overflow-hidden shadow-md transition-all duration-300 hover:shadow-xl border border-gray-100 h-full flex flex-col group"
+      data-testid={`item-card-${id}`}
     >
       {/* Image */}
       <div className="aspect-[4/3] w-full bg-gray-200 relative overflow-hidden">

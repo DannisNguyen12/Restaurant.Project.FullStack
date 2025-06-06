@@ -83,6 +83,7 @@ export default function StaticSidebar({ onCategorySelect, selectedCategoryId }: 
                     : 'text-gray-400 hover:text-white hover:bg-gray-700'
                 }`}
                 aria-current={selectedCategoryId === 0 ? 'page' : undefined}
+                data-testid="category-all-items"
               >
                 <svg 
                   className="mr-2 h-5 w-5" 
@@ -117,6 +118,7 @@ export default function StaticSidebar({ onCategorySelect, selectedCategoryId }: 
                       : 'text-gray-400 hover:text-white hover:bg-gray-700'
                   }`}
                   aria-current={selectedCategoryId === category.id ? 'page' : undefined}
+                  data-testid={`category-${category.name.toLowerCase().replace(' ', '-')}`}
                 >
                   <span>{category.name}</span>
                   {selectedCategoryId === category.id && (

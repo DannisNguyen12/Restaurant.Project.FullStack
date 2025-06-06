@@ -5,7 +5,7 @@ import { prisma } from '../../../../../../../packages/database/src/index';
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -14,7 +14,8 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const itemId = parseInt(params.id);
+    const resolvedParams = await params;
+    const itemId = parseInt(resolvedParams.id);
     if (isNaN(itemId)) {
       return NextResponse.json({ error: 'Invalid item ID' }, { status: 400 });
     }
@@ -35,7 +36,7 @@ export async function POST(
     }
 
     // Upsert the like (create or update existing)
-    const like = await prisma.like.upsert({
+    await prisma.like.upsert({
       where: {
         userId_itemId: {
           userId: parseInt(session.user.id),
@@ -52,14 +53,18 @@ export async function POST(
       }
     });
 
-    return NextResponse.json({ 
-      success: true, 
-      like: {
-        id: like.id,
-        type: like.type,
-        userId: like.userId,
-        itemId: like.itemId
+    // Get updated like count
+    const likeCount = await prisma.like.count({
+      where: { 
+        itemId: itemId,
+        type: 'LIKE'
       }
+    });
+
+    return NextResponse.json({
+      success: true,
+      liked: true,
+      likeCount: likeCount
     });
 
   } catch (error) {
@@ -70,7 +75,7 @@ export async function POST(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -79,7 +84,8 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const itemId = parseInt(params.id);
+    const resolvedParams = await params;
+    const itemId = parseInt(resolvedParams.id);
     if (isNaN(itemId)) {
       return NextResponse.json({ error: 'Invalid item ID' }, { status: 400 });
     }
@@ -92,7 +98,19 @@ export async function DELETE(
       }
     });
 
-    return NextResponse.json({ success: true });
+    // Get updated like count
+    const likeCount = await prisma.like.count({
+      where: { 
+        itemId: itemId,
+        type: 'LIKE'
+      }
+    });
+
+    return NextResponse.json({
+      success: true,
+      liked: false,
+      likeCount: likeCount
+    });
 
   } catch (error) {
     console.error('Error removing like:', error);
@@ -102,20 +120,21 @@ export async function DELETE(
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
     
-    const itemId = parseInt(params.id);
+    const resolvedParams = await params;
+    const itemId = parseInt(resolvedParams.id);
     if (isNaN(itemId)) {
       return NextResponse.json({ error: 'Invalid item ID' }, { status: 400 });
     }
 
-    let userLike = null;
+    let userHasLiked = false;
     
     if (session?.user?.id) {
-      userLike = await prisma.like.findUnique({
+      const userLike = await prisma.like.findUnique({
         where: {
           userId_itemId: {
             userId: parseInt(session.user.id),
@@ -123,27 +142,20 @@ export async function GET(
           }
         }
       });
+      userHasLiked = !!userLike;
     }
 
-    // Get like counts
-    const likeCounts = await prisma.like.groupBy({
-      by: ['type'],
+    // Get like count
+    const likes = await prisma.like.count({
       where: {
-        itemId: itemId
-      },
-      _count: {
-        type: true
+        itemId: itemId,
+        type: 'LIKE'
       }
     });
 
-    const likes = likeCounts.find(count => count.type === 'LIKE')?._count.type || 0;
-
     return NextResponse.json({
-      userLike: userLike ? userLike.type : null,
-      counts: {
-        likes,
-        total: likes
-      }
+      likes,
+      userHasLiked
     });
 
   } catch (error) {

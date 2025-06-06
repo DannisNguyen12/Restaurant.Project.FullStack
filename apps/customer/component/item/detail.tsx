@@ -47,11 +47,11 @@ export default function ItemDetail({ itemId }: ItemDetailProps) {
   
   // Like state
   const [likeData, setLikeData] = useState<{
-    userLike: 'LIKE' | null;
-    counts: { likes: number; total: number };
+    userHasLiked: boolean;
+    likes: number;
   }>({
-    userLike: null,
-    counts: { likes: 0, total: 0 }
+    userHasLiked: false,
+    likes: 0
   });
   const [likeLoading, setLikeLoading] = useState(false);
   const [cartLoading, setCartLoading] = useState(false);
@@ -94,7 +94,10 @@ export default function ItemDetail({ itemId }: ItemDetailProps) {
         const response = await fetch(`/api/items/${itemId}/like`);
         if (response.ok) {
           const data = await response.json();
-          setLikeData(data);
+          setLikeData({
+            userHasLiked: data.userHasLiked || false,
+            likes: data.likes || 0
+          });
         }
       } catch (error) {
         console.error('Error fetching like data:', error);
@@ -151,19 +154,17 @@ export default function ItemDetail({ itemId }: ItemDetailProps) {
     setLikeLoading(true);
     try {
       // If user already liked, remove it (toggle)
-      if (likeData.userLike === 'LIKE') {
+      if (likeData.userHasLiked) {
         const response = await fetch(`/api/items/${itemId}/like`, {
           method: 'DELETE',
         });
 
         if (response.ok) {
-          setLikeData(prev => ({
-            userLike: null,
-            counts: {
-              likes: Math.max(0, prev.counts.likes - 1),
-              total: Math.max(0, prev.counts.total - 1)
-            }
-          }));
+          const data = await response.json();
+          setLikeData({
+            userHasLiked: data.liked || false,
+            likes: data.likeCount || 0
+          });
           addToast({
             type: 'info',
             title: 'Like removed',
@@ -181,13 +182,11 @@ export default function ItemDetail({ itemId }: ItemDetailProps) {
         });
 
         if (response.ok) {
-          setLikeData(prev => ({
-            userLike: 'LIKE',
-            counts: {
-              likes: prev.counts.likes + 1,
-              total: prev.counts.total + 1
-            }
-          }));
+          const data = await response.json();
+          setLikeData({
+            userHasLiked: data.liked || false,
+            likes: data.likeCount || 0
+          });
           
           addToast({
             type: 'success',
@@ -388,13 +387,12 @@ export default function ItemDetail({ itemId }: ItemDetailProps) {
             {/* Stats and Actions */}
             <div className="mt-8 pt-6 border-t border-gray-200">
               <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center space-x-6">
-                  <div className="flex items-center">
-                    <svg className="h-5 w-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </svg>
-                    <span className="text-gray-600">{likeData.counts.likes} likes</span>
-                  </div>
+                <div className="flex items-center space-x-6">                <div className="flex items-center" data-testid="like-count">
+                  <svg className="h-5 w-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" data-testid="heart-icon">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                  <span className="text-gray-600">{likeData.likes} likes</span>
+                </div>
                 </div>
                 <div className="flex items-center">
                   <svg className="h-5 w-5 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -429,6 +427,7 @@ export default function ItemDetail({ itemId }: ItemDetailProps) {
                 <button 
                   onClick={handleAddToCart}
                   disabled={cartLoading || !item}
+                  data-testid="add-to-cart-button"
                   className="flex-1 py-3 px-4 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {cartLoading ? 'Adding...' : 'Add to Cart'}
@@ -436,13 +435,15 @@ export default function ItemDetail({ itemId }: ItemDetailProps) {
                 <button 
                   onClick={handleLike}
                   disabled={likeLoading}
+                  data-testid="like-button"
+                  aria-label={likeData.userHasLiked ? 'Unlike item' : 'Like item'}
                   className={`py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-                    likeData.userLike === 'LIKE' 
+                    likeData.userHasLiked 
                       ? 'bg-red-500 text-white hover:bg-red-600 focus:ring-red-500' 
                       : 'bg-gray-200 text-gray-700 hover:bg-gray-300 focus:ring-gray-500'
                   }`}
                 >
-                  <svg className="h-5 w-5" fill={likeData.userLike === 'LIKE' ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="h-5 w-5" fill={likeData.userHasLiked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                   </svg>
                 </button>
