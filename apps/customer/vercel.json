@@ -1,7 +1,0 @@
-{
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "version": 2,
-  "buildCommand": "pnpm install --no-frozen-lockfile && cd packages/database && npx prisma generate && cd ../.. && cd apps/customer && pnpm build",
-  "outputDirectory": ".next",
-  "installCommand": "pnpm install --no-frozen-lockfile"
-}
