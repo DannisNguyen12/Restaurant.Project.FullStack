@@ -1,25 +1,18 @@
 #!/bin/bash
-# Vercel build script for admin app
 set -e
 
 echo "🚀 Starting Admin App Build"
 
-# Ensure we're in the root directory
+# Change to root directory (Vercel root)
 cd /vercel/path0
 
-# Install all dependencies
-echo "📦 Installing dependencies..."
-pnpm install --frozen-lockfile=false
-
-# Generate Prisma client
+# Generate Prisma client for database package
 echo "🗄️ Generating Prisma client..."
-cd packages/database
-npx prisma generate
-cd ../..
+pnpm --filter database exec prisma generate
 
 # Build admin app specifically
 echo "👨‍💼 Building admin app..."
 cd apps/admin
-npm run build
+pnpm run build
 
 echo "✅ Admin app build completed!"
