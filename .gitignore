@@ -34,6 +34,10 @@ dist
 **/prisma/dev.db
 **/prisma/dev.db-journal
 
+# Prisma generated client
+**/src/generated/
+packages/database/src/generated/
+
 # Debug
 npm-debug.log*
 yarn-debug.log*
