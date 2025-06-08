@@ -1,5 +1,5 @@
 {
-  "buildCommand": "pnpm --filter database exec prisma generate && pnpm run build",
+  "buildCommand": "pnpm install && pnpm --filter database exec prisma generate && pnpm --filter database exec prisma db seed && pnpm run build",
   "outputDirectory": ".next",
   "framework": "nextjs"
 }
