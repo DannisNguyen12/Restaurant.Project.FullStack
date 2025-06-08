@@ -1,9 +1,8 @@
 // prisma/seed.ts
 
-import { PrismaClient } from '../generated/prisma'
+import { prisma } from './index'
 import { encryptPassword } from './encrypt';
 
-const prisma = new PrismaClient()
 
 export async function main() {
    // Clear existing data in reverse order of dependencies
