@@ -1,5 +1,10 @@
 {
-  "buildCommand": "pnpm --filter database exec prisma generate && pnpm run build",
+  "buildCommand": "pnpm install --no-frozen-lockfile && cd packages/database && npx prisma generate && cd ../.. && cd apps/customer && pnpm build",
   "outputDirectory": ".next",
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "functions": {
+    "app/api/**/*.js": {
+      "includeFiles": "../../packages/database/node_modules/.prisma/client/**"
+    }
+  }
 }
