@@ -1,8 +1,14 @@
 /** @type {import('next').NextConfig} */
+import { PrismaPlugin } from '@prisma/nextjs-monorepo-workaround-plugin';
 const nextConfig = {
-    images: {
+  images: {
     domains: ['restaurantwebsiteproject.s3.ap-southeast-2.amazonaws.com'],
   },
-};
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      config.plugins = [...config.plugins, new PrismaPlugin()];
+    }
+  },
+}
 
 export default nextConfig;
