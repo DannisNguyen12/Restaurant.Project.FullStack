@@ -2,6 +2,7 @@
   "name": "restaurant-project-fullstack",
   "private": true,
   "scripts": {
+    "postinstall": "pnpm db:generate",
     "db:generate": "pnpm --filter packages/database exec prisma generate",
     "build": "turbo run build",
     "dev": "turbo run dev",
