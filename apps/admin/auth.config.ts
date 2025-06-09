@@ -53,36 +53,6 @@ export const authOptions: NextAuthOptions = {
         })
     ],
     callbacks: {
-        async signIn({ user, account }) {
-            if (account?.provider === "google" || account?.provider === "github") {
-                try {
-                    // Check if user already exists
-                    let existingUser = await prisma.user.findUnique({
-                        where: { email: user.email! }
-                    });
-
-                    if (!existingUser) {
-                        // Create new user for OAuth signin
-                        existingUser = await prisma.user.create({
-                            data: {
-                                email: user.email!,
-                                name: user.name || '',
-                                password: '', // OAuth users don't need password
-                                role: 'USER'
-                            }
-                        });
-                    }
-
-                    // Update user ID in session
-                    user.id = existingUser.id.toString();
-                    return true;
-                } catch (error) {
-                    console.error('Error during OAuth signin:', error);
-                    return false;
-                }
-            }
-            return true;
-        },
         async jwt({ token, user }) {
             if (user) {
                 token.id = user.id;
