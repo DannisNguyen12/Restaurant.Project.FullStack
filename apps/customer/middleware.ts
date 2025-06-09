@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server"
 import { getToken } from "next-auth/jwt"
 
 // Define protected routes - only authenticated users can access these
-const protectedRoutes = ['/checkout', '/payment']
+const protectedRoutes = ['/checkout', '/payment', '/order-history']
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -83,5 +83,6 @@ export const config = {
     // Protected routes
     '/checkout/:path*',
     '/payment/:path*',
+    '/order-history/:path*',
   ]
 }

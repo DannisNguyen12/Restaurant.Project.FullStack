@@ -45,11 +45,69 @@ export default function PaymentForm({
     ...initialData,
   });
 
+  const formatCardNumber = (value: string) => {
+    // Remove all non-digits
+    const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+    // Add a space every 4 digits
+    const matches = v.match(/\d{4,16}/g);
+    const match = matches && matches[0] || '';
+    const parts = [];
+    for (let i = 0, len = match.length; i < len; i += 4) {
+      parts.push(match.substring(i, i + 4));
+    }
+    if (parts.length) {
+      return parts.join(' ');
+    } else {
+      return v;
+    }
+  };
+
+  const formatExpiryDate = (value: string) => {
+    // Remove all non-digits
+    const v = value.replace(/\D/g, '');
+    // Add slash after 2 digits
+    if (v.length >= 2) {
+      return v.substring(0, 2) + '/' + v.substring(2, 4);
+    }
+    return v;
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    let formattedValue = value;
+
+    // Apply formatting based on input type
+    if (name === 'cardNumber') {
+      formattedValue = formatCardNumber(value);
+      // Limit to 19 characters (16 digits + 3 spaces)
+      if (formattedValue.length > 19) {
+        formattedValue = formattedValue.substring(0, 19);
+      }
+    } else if (name === 'expiryDate') {
+      formattedValue = formatExpiryDate(value);
+      // Limit to 5 characters (MM/YY)
+      if (formattedValue.length > 5) {
+        formattedValue = formattedValue.substring(0, 5);
+      }
+    } else if (name === 'cvv') {
+      // Only allow digits for CVV
+      formattedValue = value.replace(/\D/g, '');
+      // Limit to 4 digits
+      if (formattedValue.length > 4) {
+        formattedValue = formattedValue.substring(0, 4);
+      }
+    } else if (name === 'zipCode') {
+      // Only allow digits and hyphens for ZIP code
+      formattedValue = value.replace(/[^0-9-]/g, '');
+      // Limit to 10 characters (12345-6789)
+      if (formattedValue.length > 10) {
+        formattedValue = formattedValue.substring(0, 10);
+      }
+    }
+
     setFormData(prev => ({
       ...prev,
-      [name]: value,
+      [name]: formattedValue,
     }));
     
     // Clear error when user starts typing
@@ -98,14 +156,36 @@ export default function PaymentForm({
     // Payment Information Validation
     if (!formData.cardNumber.trim()) {
       newErrors.cardNumber = 'Card number is required';
-    } else if (!/^\d{4}\s?\d{4}\s?\d{4}\s?\d{4}$/.test(formData.cardNumber.replace(/\s/g, ''))) {
-      newErrors.cardNumber = 'Card number is invalid';
+    } else {
+      // Remove spaces for validation
+      const cardNumberDigits = formData.cardNumber.replace(/\s/g, '');
+      if (!/^\d{16}$/.test(cardNumberDigits)) {
+        newErrors.cardNumber = 'Card number must be 16 digits';
+      }
     }
 
     if (!formData.expiryDate.trim()) {
       newErrors.expiryDate = 'Expiry date is required';
     } else if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(formData.expiryDate)) {
       newErrors.expiryDate = 'Expiry date is invalid (MM/YY)';
+    } else {
+      // Additional validation to check if the date is in the future
+      const dateParts = formData.expiryDate.split('/');
+      if (dateParts.length === 2 && dateParts[0] && dateParts[1]) {
+        const month = dateParts[0];
+        const year = dateParts[1];
+        const currentDate = new Date();
+        const currentYear = currentDate.getFullYear() % 100; // Get last 2 digits
+        const currentMonth = currentDate.getMonth() + 1; // getMonth() returns 0-11
+        const expiryYear = parseInt(year, 10);
+        const expiryMonth = parseInt(month, 10);
+        
+        if (!isNaN(expiryYear) && !isNaN(expiryMonth)) {
+          if (expiryYear < currentYear || (expiryYear === currentYear && expiryMonth < currentMonth)) {
+            newErrors.expiryDate = 'Card has expired';
+          }
+        }
+      }
     }
 
     if (!formData.cvv.trim()) {
@@ -183,6 +263,7 @@ export default function PaymentForm({
                 name="fullName"
                 value={formData.fullName}
                 onChange={handleInputChange}
+                autoComplete="name"
                 required
                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${
                   errors.fullName ? 'border-red-300 bg-red-50' : 'border-gray-300'
@@ -201,6 +282,7 @@ export default function PaymentForm({
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
+                autoComplete="email"
                 required
                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${
                   errors.email ? 'border-red-300 bg-red-50' : 'border-gray-300'
@@ -219,6 +301,7 @@ export default function PaymentForm({
                 name="phone"
                 value={formData.phone}
                 onChange={handleInputChange}
+                autoComplete="tel"
                 required
                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${
                   errors.phone ? 'border-red-300 bg-red-50' : 'border-gray-300'
@@ -299,6 +382,8 @@ export default function PaymentForm({
                 value={formData.cardNumber}
                 onChange={handleInputChange}
                 placeholder="1234 5678 9012 3456"
+                inputMode="numeric"
+                autoComplete="cc-number"
                 required
                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${
                   errors.cardNumber ? 'border-red-300 bg-red-50' : 'border-gray-300'
@@ -318,6 +403,8 @@ export default function PaymentForm({
                 value={formData.expiryDate}
                 onChange={handleInputChange}
                 placeholder="MM/YY"
+                inputMode="numeric"
+                autoComplete="cc-exp"
                 required
                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${
                   errors.expiryDate ? 'border-red-300 bg-red-50' : 'border-gray-300'
@@ -337,6 +424,8 @@ export default function PaymentForm({
                 value={formData.cvv}
                 onChange={handleInputChange}
                 placeholder="123"
+                inputMode="numeric"
+                autoComplete="cc-csc"
                 required
                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${
                   errors.cvv ? 'border-red-300 bg-red-50' : 'border-gray-300'

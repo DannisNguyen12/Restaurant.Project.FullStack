@@ -1,7 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { signOut } from 'next-auth/react';
 
 // Define category interface
 interface Category {
@@ -45,13 +44,12 @@ export default function StaticSidebar({ onCategorySelect, selectedCategoryId }: 
     fetchCategories();
   }, []);
 
-  const handleSignOut = async () => {
+  const handleOrderHistory = () => {
     try {
-      // Use NextAuth's signOut function
-      await signOut({ redirect: false });
-      router.push('/');
+      // Navigate to order history page
+      router.push('/order-history');
     } catch (error) {
-      console.error('Error during sign out:', error);
+      console.error('Error navigating to order history:', error);
     }
   };
   
@@ -136,14 +134,27 @@ export default function StaticSidebar({ onCategorySelect, selectedCategoryId }: 
       </nav>
 
 
-      {/* Logout */}
+      {/* Order History */}
       <div className="p-4 border-t border-gray-700">
           <button 
             type="button" 
-            onClick={handleSignOut}
-            className="w-full py-2 px-4 text-sm bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+            onClick={handleOrderHistory}
+            className="w-full py-2 px-4 text-sm bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors flex items-center justify-center"
           >
-            Sign Out
+            <svg 
+              className="mr-2 h-4 w-4" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+            Order History
           </button>
       </div>
 
