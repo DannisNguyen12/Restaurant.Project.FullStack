@@ -80,7 +80,7 @@ export default function TopSearchBar({ onSearch, onItemsFound }: TopSearchBarPro
   };
 
   return (
-    <header className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-10">
+    <header className="bg-white sticky top-0 z-10">
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 xl:px-8">
         <div className="flex items-center justify-between h-12 sm:h-14 lg:h-16">
           {/* Search Form */}

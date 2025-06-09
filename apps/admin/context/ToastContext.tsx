@@ -132,7 +132,7 @@ const ToastItem: React.FC<{ toast: Toast; onRemove: (id: string) => void }> = ({
         <div className="flex-shrink-0">
           {getIcon()}
         </div>
-        <div className="ml-3 w-0 flex-1">
+        <div className="ml-4 flex-1">
           <p className="text-sm font-medium">{toast.title}</p>
           {toast.message && (
             <p className="mt-1 text-sm opacity-90">{toast.message}</p>

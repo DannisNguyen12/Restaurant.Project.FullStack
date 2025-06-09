@@ -120,7 +120,7 @@ export default function Signin() {
         )}
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm space-y-4">
+          <div className="rounded-md space-y-4">
             <div>
               <label htmlFor="email-address" className="sr-only">
                 Email address
@@ -180,11 +180,6 @@ export default function Signin() {
               {passwordError && (
                 <p className="mt-1 text-sm text-red-600">{passwordError}</p>
               )}
-              <div className="flex justify-end mt-2">
-                <Link href="/forgotpassword" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
-                  Forgot password?
-                </Link>
-              </div>
             </div>
           </div>
 
