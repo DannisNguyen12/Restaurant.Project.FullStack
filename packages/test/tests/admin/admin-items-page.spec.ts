@@ -14,7 +14,7 @@ test.describe('Admin Items Page', () => {
   test('should display items page with all items loaded', async ({ page }) => {
     await page.goto('/item/417');
 
-    await expect(page.getByTitle('Edit').isVisible();
+    await expect(page.getByTitle('Edit').isVisible());
     await page.click('button:has-text("Edit")');
 
     await page.getByText('Price').click();

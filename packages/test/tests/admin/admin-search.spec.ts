@@ -2,12 +2,16 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Admin Search Functionality', () => {
   test.beforeEach(async ({ page }) => {
-    // Authenticate first
-    await page.goto('/signin');
-    await page.getByLabel(/email/i).fill('admin@restaurant.com');
-    await page.getByLabel(/password/i).fill('admin123');
-    await page.getByRole('button', { name: /sign in/i }).click();
-    await page.waitForURL('/');
+    // Navigate to admin home page
+    await page.goto('/admin');
+
+    // Login with admin credentials
+    await page.fill('[data-testid="email-input"]', 'admin@example.com');
+    await page.fill('[data-testid="password-input"]', '123');
+    await page.click('[data-testid="login-button"]');
+
+    // Wait for home page to load
+    await expect(page.locator('[data-testid="admin-home"]')).toBeVisible();
   });
 
   test('should show pho items when searching for "pho"', async ({ page }) => {
