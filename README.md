@@ -415,6 +415,11 @@ pnpm build
 - **Database Queries**: Optimized with Prisma
 - **Caching**: Multi-level caching strategy
 
+## Rationals
+- Simplicity
+- User centric
+- Accessibility
+
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
