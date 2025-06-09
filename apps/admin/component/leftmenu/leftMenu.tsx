@@ -98,7 +98,7 @@ export default function StaticSidebar({ onCategorySelect, selectedCategoryId }: 
             {categories.map((category) => (
               <li key={category.id}>
                 <button
-                  data-testid={`category-${category.name.toLowerCase().replace(/\s+/g, '-')}`}
+                  data-testid={`category-${category.id}`}
                   onClick={() => onCategorySelect?.(category.id)}
                   className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${
                     selectedCategoryId === category.id 
