@@ -5,21 +5,54 @@ test.describe('Admin Items Page', () => {
     // Navigate to admin login page
     await page.goto('/signin');
     
-    // Assume admin credentials exist for testing
-    await page.fill('input[name="email"]', 'admin@example.com');
-    await page.fill('input[name="password"]', '123');
-    await page.click('button[type="submit"]');
+    // Use proper test-id selectors like the other tests
+    await page.fill('[data-testid="email-input"]', 'admin@example.com');
+    await page.fill('[data-testid="password-input"]', '123');
+    await page.click('[data-testid="login-button"]');
+    
+    // Wait for successful authentication
+    await page.waitForURL('/');
+    await expect(page.locator('[data-testid="admin-home"]')).toBeVisible();
   });
 
   test('should display items page with all items loaded', async ({ page }) => {
-    await page.goto('/item/417');
+    // First, wait for items to load on the home page to get a valid item ID
+    await page.waitForSelector('[data-testid^="item-card-"]', { timeout: 10000 });
+    
+    // Get the first item card and extract its ID from the data-testid
+    const firstItemCard = page.locator('[data-testid^="item-card-"]').first();
+    await expect(firstItemCard).toBeVisible();
+    
+    // Get the item ID from the data-testid attribute (format: "item-card-{id}")
+    const itemTestId = await firstItemCard.getAttribute('data-testid');
+    const itemId = itemTestId?.replace('item-card-', '');
+    
+    if (!itemId) {
+      throw new Error('Could not extract item ID from test data');
+    }
 
-    await expect(page.getByTitle('Edit').isVisible());
-    await page.click('button:has-text("Edit")');
+    // Navigate to the item detail page
+    await page.goto(`/item/${itemId}`);
+    
+    // Wait for the item page to load
+    await page.waitForLoadState('networkidle');
+    
+    // Look for Edit button - it might be in different formats, so let's be flexible
+    const editButton = page.locator('button').filter({ hasText: /edit/i }).first();
+    await expect(editButton).toBeVisible({ timeout: 5000 });
+    await editButton.click();
 
-    await page.getByText('Price').click();
-    await page.getByLabel('Price').fill('10.99');
-    await page.click('button:has-text("Save")');
-    await expect(page.getByText('10.99')).toBeVisible();
+    // Wait for edit form to appear and find price input
+    const priceInput = page.locator('input[name="price"], input[type="number"], input').filter({ hasText: /price/i }).first();
+    await expect(priceInput).toBeVisible({ timeout: 5000 });
+    await priceInput.fill('10.99');
+    
+    // Click save button
+    const saveButton = page.locator('button').filter({ hasText: /save/i }).first();
+    await expect(saveButton).toBeVisible();
+    await saveButton.click();
+    
+    // Wait for save to complete and verify the price is updated
+    await expect(page.getByText('10.99')).toBeVisible({ timeout: 5000 });
   });
 });

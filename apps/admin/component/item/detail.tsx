@@ -44,15 +44,15 @@ export default function ItemDetail({ itemId }: ItemDetailProps) {
   const [categories, setCategories] = useState<Category[]>([]);
   const { addToast } = useToast();
 
-  // Edit form state
+  // Edit form state - using text fields for array inputs to allow normal text input
   const [editForm, setEditForm] = useState({
     name: '',
     fullDescription: '',
     price: 0,
     image: '',
-    ingredients: [] as string[],
-    servingTips: [] as string[],
-    recommendations: [] as string[],
+    ingredientsText: '',
+    servingTipsText: '',
+    recommendationsText: '',
     categoryId: null as number | null
   });
 
@@ -100,9 +100,9 @@ export default function ItemDetail({ itemId }: ItemDetailProps) {
           fullDescription: data.fullDescription || '',
           price: data.price || 0,
           image: data.image || '',
-          ingredients: getJsonArray(data.ingredients),
-          servingTips: getJsonArray(data.servingTips),
-          recommendations: getJsonArray(data.recommendations),
+          ingredientsText: getJsonArray(data.ingredients).join('\n'),
+          servingTipsText: getJsonArray(data.servingTips).join('\n'),
+          recommendationsText: getJsonArray(data.recommendations).join('\n'),
           categoryId: data.category?.id || null
         });
       } catch (err) {
@@ -156,14 +156,19 @@ export default function ItemDetail({ itemId }: ItemDetailProps) {
           fullDescription: item.fullDescription || '',
           price: item.price || 0,
           image: item.image || '',
-          ingredients: getJsonArray(item.ingredients),
-          servingTips: getJsonArray(item.servingTips),
-          recommendations: getJsonArray(item.recommendations),
+          ingredientsText: getJsonArray(item.ingredients).join('\n'),
+          servingTipsText: getJsonArray(item.servingTips).join('\n'),
+          recommendationsText: getJsonArray(item.recommendations).join('\n'),
           categoryId: item.category?.id || null
         });
       }
     }
     setIsEditing(!isEditing);
+  };
+
+  // Convert text fields to arrays for API submission
+  const getArrayFromText = (text: string): string[] => {
+    return text.split('\n').map(item => item.trim()).filter(item => item.length > 0);
   };
 
   // Save changes
@@ -172,12 +177,24 @@ export default function ItemDetail({ itemId }: ItemDetailProps) {
 
     setIsSaving(true);
     try {
+      // Convert text fields to arrays for API submission
+      const apiData = {
+        name: editForm.name,
+        fullDescription: editForm.fullDescription,
+        price: editForm.price,
+        image: editForm.image,
+        ingredients: getArrayFromText(editForm.ingredientsText),
+        servingTips: getArrayFromText(editForm.servingTipsText),
+        recommendations: getArrayFromText(editForm.recommendationsText),
+        categoryId: editForm.categoryId
+      };
+
       const response = await fetch(`/api/items/${item.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(editForm),
+        body: JSON.stringify(apiData),
       });
 
       if (!response.ok) {
@@ -207,17 +224,11 @@ export default function ItemDetail({ itemId }: ItemDetailProps) {
   };
 
   // Handle form input changes
-  const handleInputChange = (field: string, value: string | number | string[] | null) => {
+  const handleInputChange = (field: string, value: string | number | null) => {
     setEditForm(prev => ({
       ...prev,
       [field]: value
     }));
-  };
-
-  // Handle array field changes (ingredients, servingTips, recommendations)
-  const handleArrayFieldChange = (field: 'ingredients' | 'servingTips' | 'recommendations', value: string) => {
-    const array = value.split('\n').map(item => item.trim()).filter(item => item.length > 0);
-    handleInputChange(field, array);
   };
 
   // Delete item
@@ -429,8 +440,8 @@ export default function ItemDetail({ itemId }: ItemDetailProps) {
                     {isEditing ? (
                       <div>
                         <textarea
-                          value={editForm.ingredients.join('\n')}
-                          onChange={(e) => handleArrayFieldChange('ingredients', e.target.value)}
+                          value={editForm.ingredientsText}
+                          onChange={(e) => handleInputChange('ingredientsText', e.target.value)}
                           className="w-full h-32 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
                           placeholder="Enter each ingredient on a new line..."
                         />
@@ -464,8 +475,8 @@ export default function ItemDetail({ itemId }: ItemDetailProps) {
                     {isEditing ? (
                       <div>
                         <textarea
-                          value={editForm.servingTips.join('\n')}
-                          onChange={(e) => handleArrayFieldChange('servingTips', e.target.value)}
+                          value={editForm.servingTipsText}
+                          onChange={(e) => handleInputChange('servingTipsText', e.target.value)}
                           className="w-full h-32 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
                           placeholder="Enter each serving tip on a new line..."
                         />
@@ -499,8 +510,8 @@ export default function ItemDetail({ itemId }: ItemDetailProps) {
                     {isEditing ? (
                       <div>
                         <textarea
-                          value={editForm.recommendations.join('\n')}
-                          onChange={(e) => handleArrayFieldChange('recommendations', e.target.value)}
+                          value={editForm.recommendationsText}
+                          onChange={(e) => handleInputChange('recommendationsText', e.target.value)}
                           className="w-full h-32 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
                           placeholder="Enter each recommendation on a new line..."
                         />

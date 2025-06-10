@@ -25,15 +25,17 @@ export default function CreateItemForm() {
   const { addToast } = useToast();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState<CreateItemFormData>({
+  
+  // Use separate text state for array fields to allow normal text input
+  const [formData, setFormData] = useState({
     name: '',
     fullDescription: '',
     price: 0,
     image: '',
-    ingredients: [],
-    servingTips: [],
-    recommendations: [],
-    categoryId: null
+    ingredientsText: '',
+    servingTipsText: '',
+    recommendationsText: '',
+    categoryId: null as number | null
   });
 
   // Fetch categories for dropdown
@@ -54,17 +56,16 @@ export default function CreateItemForm() {
   }, []);
 
   // Handle form input changes
-  const handleInputChange = (field: keyof CreateItemFormData, value: string | number | string[] | null) => {
+  const handleInputChange = (field: string, value: string | number | null) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
   };
 
-  // Handle array field changes (ingredients, servingTips, recommendations)
-  const handleArrayFieldChange = (field: 'ingredients' | 'servingTips' | 'recommendations', value: string) => {
-    const array = value.split('\n').map(item => item.trim()).filter(item => item.length > 0);
-    handleInputChange(field, array);
+  // Convert text fields to arrays for API submission
+  const getArrayFromText = (text: string): string[] => {
+    return text.split('\n').map(item => item.trim()).filter(item => item.length > 0);
   };
 
   // Handle form submission
@@ -92,12 +93,24 @@ export default function CreateItemForm() {
 
     setLoading(true);
     try {
+      // Convert text fields to arrays for API submission
+      const submitData: CreateItemFormData = {
+        name: formData.name,
+        fullDescription: formData.fullDescription,
+        price: formData.price,
+        image: formData.image,
+        ingredients: getArrayFromText(formData.ingredientsText),
+        servingTips: getArrayFromText(formData.servingTipsText),
+        recommendations: getArrayFromText(formData.recommendationsText),
+        categoryId: formData.categoryId
+      };
+
       const response = await fetch('/api/items', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(submitData),
       });
 
       if (!response.ok) {
@@ -110,7 +123,7 @@ export default function CreateItemForm() {
       addToast({
         type: 'success',
         title: 'Item Created',
-        message: `${formData.name} has been successfully created`
+        message: `${submitData.name} has been successfully created`
       });
 
       // Redirect to the new item's detail page
@@ -252,8 +265,8 @@ export default function CreateItemForm() {
                 Ingredients
               </label>
               <textarea
-                value={formData.ingredients.join('\n')}
-                onChange={(e) => handleArrayFieldChange('ingredients', e.target.value)}
+                value={formData.ingredientsText}
+                onChange={(e) => handleInputChange('ingredientsText', e.target.value)}
                 className="w-full h-24 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
                 placeholder="Enter each ingredient on a new line..."
               />
@@ -266,8 +279,8 @@ export default function CreateItemForm() {
                 Serving Tips
               </label>
               <textarea
-                value={formData.servingTips.join('\n')}
-                onChange={(e) => handleArrayFieldChange('servingTips', e.target.value)}
+                value={formData.servingTipsText}
+                onChange={(e) => handleInputChange('servingTipsText', e.target.value)}
                 className="w-full h-24 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
                 placeholder="Enter each serving tip on a new line..."
               />
@@ -280,8 +293,8 @@ export default function CreateItemForm() {
                 Recommendations
               </label>
               <textarea
-                value={formData.recommendations.join('\n')}
-                onChange={(e) => handleArrayFieldChange('recommendations', e.target.value)}
+                value={formData.recommendationsText}
+                onChange={(e) => handleInputChange('recommendationsText', e.target.value)}
                 className="w-full h-24 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
                 placeholder="Enter each recommendation on a new line..."
               />

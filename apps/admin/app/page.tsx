@@ -50,7 +50,7 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="flex flex-col lg:flex-row h-screen overflow-hidden bg-gray-100">
+    <div data-testid="admin-home" className="flex flex-col lg:flex-row h-screen overflow-hidden bg-gray-100">
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
         <div className="lg:hidden fixed inset-0 z-50 flex">
