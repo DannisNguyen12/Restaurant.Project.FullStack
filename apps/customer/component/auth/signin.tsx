@@ -217,7 +217,7 @@ export default function Signin() {
           <div className="mt-6 grid grid-cols-2 gap-3">
             <button
               type="button"
-              onClick={() => signIn('google')}
+              onClick={() => signIn('google', { callbackUrl: '/' })}
               className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
               <span className="sr-only">Sign in with Google</span>
@@ -228,7 +228,7 @@ export default function Signin() {
 
             <button
               type="button"
-              onClick={() => signIn('github')}
+              onClick={() => signIn('github', { callbackUrl: '/' })}
               className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
               <span className="sr-only">Sign in with GitHub</span>
