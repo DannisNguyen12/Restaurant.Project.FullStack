@@ -131,6 +131,7 @@ export default function Signin() {
                 type="email"
                 autoComplete="email"
                 required
+                data-testid="email-input" 
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value)
@@ -158,6 +159,7 @@ export default function Signin() {
                   type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   required
+                  data-testid="password-input" 
                   value={password}
                   onChange={(e) => {
                     setPassword(e.target.value)
@@ -187,6 +189,7 @@ export default function Signin() {
             <button
               type="submit"
               disabled={isLoading}
+              data-testid="login-button" 
               className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200 disabled:opacity-70"
             >
               {isLoading ? (

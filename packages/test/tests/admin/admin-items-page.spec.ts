@@ -43,7 +43,18 @@ test.describe('Admin Items Page', () => {
     await editButton.click();
 
     // Wait for edit form to appear and find price input
-    const priceInput = page.locator('input[name="price"], input[type="number"], input').filter({ hasText: /price/i }).first();
+    // Try different selectors for price input
+    let priceInput = page.locator('input[name="price"]');
+    if (await priceInput.count() === 0) {
+      priceInput = page.locator('input[type="number"]');
+    }
+    if (await priceInput.count() === 0) {
+      priceInput = page.locator('input').filter({ hasText: /price/i }).first();
+    }
+    if (await priceInput.count() === 0) {
+      priceInput = page.locator('[data-testid*="price"]');
+    }
+    
     await expect(priceInput).toBeVisible({ timeout: 5000 });
     await priceInput.fill('10.99');
     

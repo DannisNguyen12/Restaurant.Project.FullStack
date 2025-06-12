@@ -1,10 +1,6 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Admin Authentication', () => {
-  test.beforeEach(async ({ page }) => {
-    // Start fresh for each test
-    await page.goto('/');
-  });
 
   test('should handle invalid login credentials', async ({ page }) => {
     await page.goto('/signin');

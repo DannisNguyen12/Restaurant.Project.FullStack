@@ -104,6 +104,7 @@ export default function TopSearchBar({ onSearch, onItemsFound }: TopSearchBarPro
               
               <input
                 type="text"
+                data-testid="search-input"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search for menu items..."

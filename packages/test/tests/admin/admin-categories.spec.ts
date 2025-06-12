@@ -48,6 +48,21 @@ test.describe('Admin Category Navigation', () => {
 
     // Wait for filter to apply
     await expect(page.locator('[data-testid^="item-card-"]')).toHaveCount(2); // Should show Pho Bo and Banh Mi
+    
+    // Verify main course items are visible
+    await expect(page.locator('text=Pho Bo')).toBeVisible();
+    await expect(page.locator('text=Banh Mi')).toBeVisible();
+
+    // Click "All Items" to show all items again
+    await expect(page.locator('[data-testid="category-all-items"]')).toBeVisible();
+    await page.click('[data-testid="category-all-items"]');
+    await expect(page.locator('[data-testid^="item-card-"]')).toHaveCount(4);
+    
+    // Verify all items are visible again
+    await expect(page.locator('text=Pho Bo')).toBeVisible();
+    await expect(page.locator('text=Banh Mi')).toBeVisible();
+    await expect(page.locator('text=Spring Rolls')).toBeVisible();
+    await expect(page.locator('text=Tiramisu')).toBeVisible();
   });
 
   test('should display category names correctly', async ({ page }) => {

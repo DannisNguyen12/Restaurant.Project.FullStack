@@ -110,7 +110,6 @@ export const authOptions: NextAuthOptions = {
     },
     pages: {
         signIn: '/signin',
-        // Remove error redirect to signin to prevent redirect loops
     },
     session: {
         strategy: "jwt",

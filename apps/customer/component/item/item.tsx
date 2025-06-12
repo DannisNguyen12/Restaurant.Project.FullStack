@@ -126,6 +126,7 @@ export default function Item({
           </span>
           
           <button
+            data-testid={`add-to-cart-button-${id}`}
             onClick={handleAddToCart}
             disabled={isLoading}
             className={`flex-1 max-w-[140px] px-4 py-2.5 rounded-lg bg-indigo-600 text-white font-medium text-sm

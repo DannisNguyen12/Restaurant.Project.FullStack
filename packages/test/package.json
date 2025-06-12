@@ -4,7 +4,7 @@
   "description": "E2E testing for Restaurant Project using Playwright",
   "main": "index.js",
   "scripts": {
-    "test": "playwright test",
+    "test": "npx playwright test --reporter=list",
     "test:headed": "playwright test --headed",
     "test:debug": "playwright test --debug",
     "test:admin": "playwright test --project=admin",
