@@ -1,5 +1,5 @@
 'use client';
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
 
 // Define the cart item type
 export interface CartItem {
@@ -28,9 +28,48 @@ interface CartContextType {
 // Create the context
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+// Constants
+const CART_STORAGE_KEY = 'restaurant-cart';
+
 // Cart provider component
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // Load cart from localStorage on component mount
+  useEffect(() => {
+    const loadCartFromStorage = () => {
+      try {
+        const savedCart = localStorage.getItem(CART_STORAGE_KEY);
+        if (savedCart) {
+          const parsedCart = JSON.parse(savedCart) as CartItem[];
+          // Validate the cart data structure
+          if (Array.isArray(parsedCart)) {
+            setCartItems(parsedCart);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading cart from localStorage:', error);
+        // Clear corrupted data
+        localStorage.removeItem(CART_STORAGE_KEY);
+      } finally {
+        setIsLoaded(true);
+      }
+    };
+
+    loadCartFromStorage();
+  }, []);
+
+  // Save cart to localStorage whenever cartItems change (but only after initial load)
+  useEffect(() => {
+    if (isLoaded) {
+      try {
+        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
+      } catch (error) {
+        console.error('Error saving cart to localStorage:', error);
+      }
+    }
+  }, [cartItems, isLoaded]);
 
   // Add item to cart
   const addToCart = useCallback((item: Omit<CartItem, 'quantity'>, quantity = 1) => {
@@ -73,6 +112,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // Clear entire cart
   const clearCart = useCallback(() => {
     setCartItems([]);
+    // Also clear from localStorage immediately
+    try {
+      localStorage.removeItem(CART_STORAGE_KEY);
+    } catch (error) {
+      console.error('Error clearing cart from localStorage:', error);
+    }
   }, []);
 
   // Calculate cart subtotal
@@ -112,6 +157,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
     getCartItemCount,
     isItemInCart,
   };
+
+  // Don't render children until cart is loaded from localStorage
+  if (!isLoaded) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      </div>
+    );
+  }
 
   return (
     <CartContext.Provider value={contextValue}>

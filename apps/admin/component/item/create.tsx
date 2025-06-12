@@ -30,7 +30,7 @@ export default function CreateItemForm() {
   const [formData, setFormData] = useState({
     name: '',
     fullDescription: '',
-    price: 0,
+    price: '',
     image: '',
     ingredientsText: '',
     servingTipsText: '',
@@ -82,7 +82,7 @@ export default function CreateItemForm() {
       return;
     }
 
-    if (formData.price <= 0) {
+    if (parseFloat(formData.price) <= 0) {
       addToast({
         type: 'error',
         title: 'Validation Error',
@@ -97,7 +97,7 @@ export default function CreateItemForm() {
       const submitData: CreateItemFormData = {
         name: formData.name,
         fullDescription: formData.fullDescription,
-        price: formData.price,
+        price: parseFloat(formData.price),
         image: formData.image,
         ingredients: getArrayFromText(formData.ingredientsText),
         servingTips: getArrayFromText(formData.servingTipsText),
