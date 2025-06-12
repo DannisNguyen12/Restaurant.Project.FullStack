@@ -40,7 +40,6 @@ export async function middleware(request: NextRequest) {
       if (userSession && userSession.id && userSession.email) {
         isAuthenticated = true
         authMethod = 'CustomAuth'
-        console.log(`User authenticated via custom session: ${userSession.email}`)
       }
     } catch (error) {
       console.log('Custom session parsing failed:', error)
@@ -58,7 +57,6 @@ export async function middleware(request: NextRequest) {
       if (token && token.email) {
         isAuthenticated = true
         authMethod = 'NextAuth'
-        console.log(`User authenticated via NextAuth token: ${token.email}`)
       }
     } catch (error) {
       console.log('NextAuth token verification failed:', error)
@@ -69,8 +67,6 @@ export async function middleware(request: NextRequest) {
   if (!isAuthenticated) {
     const signinUrl = new URL('/signin', request.url)
     signinUrl.searchParams.set('callbackUrl', pathname)
-    
-    console.log(`Redirecting unauthenticated user from ${pathname} to signin`)
     
     // Create redirect response and clear any invalid tokens
     const response = NextResponse.redirect(signinUrl)
