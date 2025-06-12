@@ -39,11 +39,15 @@ export const authOptions: NextAuthOptions = {
                         throw new Error('Invalid email or password');
                     }
 
+                    if (user.role != "ADMIN") {
+                        throw new Error('Unauthorized access: Admin role required');
+                    }
+
                     return { 
                         id: user.id.toString(), 
                         email: user.email, 
                         name: user.name || '',
-                        role: user.role || 'USER'
+                        role: user.role || 'ADMIN'
                     };
                 } catch (error) {
                     console.error('Error during credentials authorization:', error);
@@ -56,7 +60,7 @@ export const authOptions: NextAuthOptions = {
         async jwt({ token, user }) {
             if (user) {
                 token.id = user.id;
-                token.role = user.role || 'USER';
+                token.role = user.role || 'ADMIN';
             }
             return token;
         },
